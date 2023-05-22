@@ -9,6 +9,8 @@ project(
 
 include(cmake/variables.cmake)
 
+find_package(fmt REQUIRED)
+
 add_library(
     pgen_lib OBJECT
     src/lib.cpp
@@ -19,6 +21,8 @@ target_include_directories(
     PUBLIC
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>"
 )
+
+target_link_libraries(pgen_lib PUBLIC fmt::fmt)
 
 add_executable(
     pgen_exe
