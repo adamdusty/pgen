@@ -1,15 +1,31 @@
 #include "lib.hpp"
 
+#include "json.hpp"
 #include <algorithm>
 #include <fmt/format.h>
+#include <fstream>
 #include <regex>
 
 namespace pgen {
 
+using json = nlohmann::json;
+
+auto read_template(const std::string& templ_str) -> std::unordered_map<fs::path, std::string> {
+    // TODO: Implement
+
+    auto j     = json::parse(templ_str);
+    auto templ = std::unordered_map<fs::path, std::string>{};
+
+    for(auto& [path, content]: j.at("files").items()) {
+        templ.emplace(path, content);
+    }
+
+    return templ;
+}
+
 auto render_content(const std::unordered_map<fs::path, std::string> files,
                     const std::unordered_map<std::string, std::string> values)
     -> std::unordered_map<fs::path, std::string> {
-    // TODO: Implement
 
     auto rendered    = std::unordered_map<fs::path, std::string>{};
     auto match       = std::smatch{};
@@ -36,8 +52,25 @@ auto render_content(const std::unordered_map<fs::path, std::string> files,
     return rendered;
 }
 
-auto write_files(const std::unordered_map<fs::path, std::string> files) -> void {
+auto write_files(const fs::path root, const std::unordered_map<fs::path, std::string> files) -> void {
     // TODO: Implement
+
+    if(fs::exists(root)) {
+        return;
+    }
+
+    fs::create_directory(root);
+
+    for(auto& [relpath, content]: files) {
+        if(!fs::exists(root / relpath.parent_path())) {
+            fs::create_directory(root / relpath.parent_path());
+        }
+
+        auto path = root / relpath;
+        auto file = std::ofstream{path};
+        file << content;
+        file.close();
+    }
 }
 
 } // namespace pgen

@@ -2,12 +2,29 @@
 #include <algorithm>
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
+#include <fstream>
 #include <string>
 #include <unordered_map>
 
 namespace fs = std::filesystem;
 
-TEST_CASE("Render Content", "[pgen_lib]") {
+TEST_CASE("Read template", "[read_template]") {
+
+    auto templ_json =
+        R"({"files":{"src/main.cpp":"hello world main","src/{{app_name}}.hpp":"hello world header","src/{{app_name}}.cpp":"hello world impl"}})";
+
+    auto templ = pgen::read_template(templ_json);
+
+    CHECK_FALSE(templ.find("src/main.cpp") == templ.end());
+    CHECK_FALSE(templ.find("src/{{app_name}}.hpp") == templ.end());
+    CHECK_FALSE(templ.find("src/{{app_name}}.cpp") == templ.end());
+
+    CHECK(templ.at("src/main.cpp") == "hello world main");
+    CHECK(templ.at("src/{{app_name}}.hpp") == "hello world header");
+    CHECK(templ.at("src/{{app_name}}.cpp") == "hello world impl");
+}
+
+TEST_CASE("Render Content", "[render_content]") {
 
     auto files  = std::unordered_map<fs::path, std::string>{};
     auto values = std::unordered_map<std::string, std::string>{};
@@ -69,4 +86,25 @@ TEST_CASE("Render Content", "[pgen_lib]") {
         CHECK(rendered.at("src/file1.cpp") == "hello world");
         CHECK(rendered.at("src/file2.cpp") == "hello world 2");
     }
+}
+
+TEST_CASE("Writing files", "[write_files]") {
+    auto files = std::unordered_map<fs::path, std::string>{};
+    files.emplace("src/main.cpp", "hello from main");
+    files.emplace("src/lib.hpp", "hello from lib header");
+    files.emplace("src/lib.cpp", "hello from lib impl");
+
+    auto temp = fs::temp_directory_path();
+    pgen::write_files(temp / "pgen_test", files);
+
+    for(auto& [p, c]: files) {
+        CHECK(fs::exists(temp / "pgen_test" / p));
+        auto content_stream = std::ifstream{temp / "pgen_test" / p};
+        auto buffer         = std::stringstream{};
+        buffer << content_stream.rdbuf();
+
+        CHECK(buffer.str() == c);
+    }
+
+    fs::remove_all(temp / "pgen_test");
 }
