@@ -10,6 +10,7 @@ project(
 include(cmake/variables.cmake)
 
 find_package(fmt REQUIRED)
+find_package(argparse REQUIRED)
 
 add_library(
     pgen_lib OBJECT
@@ -22,7 +23,7 @@ target_include_directories(
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>"
 )
 
-target_link_libraries(pgen_lib PUBLIC fmt::fmt)
+target_link_libraries(pgen_lib PUBLIC fmt::fmt argparse::argparse)
 
 add_executable(
     pgen_exe

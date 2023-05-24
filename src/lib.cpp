@@ -10,14 +10,18 @@ namespace pgen {
 
 using json = nlohmann::json;
 
-auto read_template(const std::string& templ_str) -> std::unordered_map<fs::path, std::string> {
+auto read_template(std::istream& templ_str) -> project_template {
     // TODO: Implement
 
     auto j     = json::parse(templ_str);
-    auto templ = std::unordered_map<fs::path, std::string>{};
+    auto templ = project_template{};
+
+    for(auto& v: j.at("vars")) {
+        templ.vars.emplace_back(v);
+    }
 
     for(auto& [path, content]: j.at("files").items()) {
-        templ.emplace(path, content);
+        templ.files.emplace(path, content);
     }
 
     return templ;

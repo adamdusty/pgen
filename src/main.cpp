@@ -1,28 +1,38 @@
 #include "lib.hpp"
+#include <argparse/argparse.hpp>
 #include <filesystem>
 #include <fmt/format.h>
-#include <iostream>
+#include <fstream>
+#include <string>
 #include <unordered_map>
 
 namespace fs = std::filesystem;
+namespace ap = argparse;
 
 auto main(int argc, char** argv) -> int {
 
-    auto files  = std::unordered_map<fs::path, std::string>{};
-    auto values = std::unordered_map<std::string, std::string>{};
+    auto program = ap::ArgumentParser{"ProjectGen"};
 
-    files.emplace("src/{{dir1}}/{{file1_name}}.cpp", "hello world 1");
+    program.add_argument("dest").help("Destination directory for project.");
+    program.add_argument("-t", "--template").help("Project template json file").required();
 
-    values.emplace("file1_name", "file1");
-    values.emplace("dir1", "subdir");
-
-    auto rendered = pgen::render_content(files, values);
-
-    fmt::print("Rendered: {}\n", rendered.size());
-
-    for(auto [path, content]: rendered) {
-        fmt::print("PATH: {}\n", path.string());
+    try {
+        program.parse_args(argc, argv);
+    } catch(const std::runtime_error& err) {
+        fmt::println("ERROR: {}", err.what());
+        return 1;
     }
+
+    auto template_path = fs::path{program.get<std::string>("--template")};
+    if(!fs::exists(template_path)) {
+        fmt::println("ERROR: Template file not found: {}", template_path.string());
+    }
+
+    auto template_file_stream = std::ifstream{template_path};
+    auto templ                = pgen::read_template(template_file_stream);
+
+    for(auto v: templ.vars)
+        fmt::println("VAR: {}", v);
 
     return 0;
 }

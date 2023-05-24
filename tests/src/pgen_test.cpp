@@ -3,6 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <unordered_map>
 
@@ -11,17 +12,20 @@ namespace fs = std::filesystem;
 TEST_CASE("Read template", "[read_template]") {
 
     auto templ_json =
-        R"({"files":{"src/main.cpp":"hello world main","src/{{app_name}}.hpp":"hello world header","src/{{app_name}}.cpp":"hello world impl"}})";
+        R"({"vars":["app_name","file_name"],"files":{"src/main.cpp":"hello world main","src/{{app_name}}.hpp":"hello world header","src/{{app_name}}.cpp":"hello world impl"}})";
+    auto templ_stream = std::stringstream{templ_json};
 
-    auto templ = pgen::read_template(templ_json);
+    auto templ = pgen::read_template(templ_stream);
 
-    CHECK_FALSE(templ.find("src/main.cpp") == templ.end());
-    CHECK_FALSE(templ.find("src/{{app_name}}.hpp") == templ.end());
-    CHECK_FALSE(templ.find("src/{{app_name}}.cpp") == templ.end());
+    CHECK_FALSE(templ.files.find("src/main.cpp") == templ.files.end());
+    CHECK_FALSE(templ.files.find("src/{{app_name}}.hpp") == templ.files.end());
+    CHECK_FALSE(templ.files.find("src/{{app_name}}.cpp") == templ.files.end());
 
-    CHECK(templ.at("src/main.cpp") == "hello world main");
-    CHECK(templ.at("src/{{app_name}}.hpp") == "hello world header");
-    CHECK(templ.at("src/{{app_name}}.cpp") == "hello world impl");
+    CHECK(templ.files.at("src/main.cpp") == "hello world main");
+    CHECK(templ.files.at("src/{{app_name}}.hpp") == "hello world header");
+    CHECK(templ.files.at("src/{{app_name}}.cpp") == "hello world impl");
+    CHECK_FALSE(std::find(templ.vars.begin(), templ.vars.end(), "app_name") == templ.vars.end());
+    CHECK_FALSE(std::find(templ.vars.begin(), templ.vars.end(), "file_name") == templ.vars.end());
 }
 
 TEST_CASE("Render Content", "[render_content]") {
