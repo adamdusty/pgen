@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fmt/format.h>
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -30,9 +31,19 @@ auto main(int argc, char** argv) -> int {
 
     auto template_file_stream = std::ifstream{template_path};
     auto templ                = pgen::read_template(template_file_stream);
+    auto values               = std::unordered_map<std::string, std::string>{};
 
-    for(auto v: templ.vars)
-        fmt::println("VAR: {}", v);
+    fmt::println("Enter values");
+    for(auto& v: templ.vars) {
+        auto line = std::string{};
+        fmt::print("{}: ", v);
+        std::getline(std::cin, line);
+        values.emplace(v, line);
+    }
+
+    for(auto [k, v]: values) {
+        fmt::println("{}: {}", k, v);
+    }
 
     return 0;
 }
