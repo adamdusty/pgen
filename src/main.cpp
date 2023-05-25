@@ -52,5 +52,7 @@ auto main(int argc, char** argv) -> int {
     auto rendered = pgen::render_content(templ.files, values);
     auto result   = pgen::write_files(dest, rendered);
 
+    fmt::println("{}", result.msg);
+
     return 0;
 }

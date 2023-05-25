@@ -99,18 +99,19 @@ TEST_CASE("Writing files", "[write_files]") {
     files.emplace("src/lib.cpp", "hello from lib impl");
 
     auto temp = fs::temp_directory_path();
-    auto res  = pgen::write_files(temp / "pgen_test", files);
+    auto root = temp / "pgen_test";
+    auto res  = pgen::write_files(root, files);
 
     CHECK(res.success);
 
     for(auto& [p, c]: files) {
-        CHECK(fs::exists(temp / "pgen_test" / p));
-        auto content_stream = std::ifstream{temp / "pgen_test" / p};
+        CHECK(fs::exists(root / p));
+        auto content_stream = std::ifstream{root / p};
         auto buffer         = std::stringstream{};
         buffer << content_stream.rdbuf();
 
         CHECK(buffer.str() == c);
     }
 
-    fs::remove_all(temp / "pgen_test");
+    fs::remove_all(root);
 }

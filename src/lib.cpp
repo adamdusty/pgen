@@ -69,7 +69,7 @@ auto write_files(const fs::path root, const std::unordered_map<fs::path, std::st
 
     for(auto& [relpath, content]: files) {
         if(!fs::exists(root / relpath.parent_path())) {
-            auto created = fs::create_directory(root / relpath.parent_path());
+            auto created = fs::create_directories(root / relpath.parent_path());
             if(!created) {
                 return {false, fmt::format("Unable to create directory: {}", relpath.parent_path().string())};
             }
@@ -79,6 +79,7 @@ auto write_files(const fs::path root, const std::unordered_map<fs::path, std::st
         auto file = std::ofstream{path};
         file << content;
         file.close();
+        fmt::println("File written: {}", path.string());
     }
 
     return {true, "Files written successfully"};
