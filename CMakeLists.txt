@@ -10,6 +10,7 @@ project(
 include(cmake/variables.cmake)
 
 find_package(fmt REQUIRED)
+find_package(tomlplusplus REQUIRED)
 find_package(argparse REQUIRED)
 
 add_library(
@@ -23,13 +24,14 @@ target_include_directories(
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>"
 )
 
-target_link_libraries(pgen_lib PUBLIC fmt::fmt argparse::argparse)
+target_link_libraries(pgen_lib PUBLIC fmt::fmt tomlplusplus::tomlplusplus argparse::argparse)
 
 add_executable(
     pgen_exe
     src/main.cpp
 )
 
+target_compile_definitions(pgen_exe PRIVATE -DTOML_HEADER_ONLY=0)
 target_link_libraries(pgen_exe PRIVATE pgen_lib)
 
 set_target_properties(

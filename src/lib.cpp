@@ -1,27 +1,38 @@
 #include "lib.hpp"
 
-#include "json.hpp"
 #include <algorithm>
 #include <fmt/format.h>
 #include <fstream>
 #include <regex>
+#include <toml++/toml.h>
 
 namespace pgen {
 
-using json = nlohmann::json;
-
 auto read_template(std::istream& templ_str) -> project_template {
-    // TODO: Implement
 
-    auto j     = json::parse(templ_str);
-    auto templ = project_template{};
+    toml::table t;
 
-    for(auto& v: j.at("vars")) {
-        templ.vars.emplace_back(v);
+    try {
+        t = toml::parse(templ_str);
+    } catch(toml::parse_error& err) {
+        fmt::println("Error parsing template: {}", err.what());
+        std::exit(1);
     }
 
-    for(auto& [path, content]: j.at("files").items()) {
-        templ.files.emplace(path, content);
+    auto templ = project_template{};
+
+    for(auto& v: *t.at("vars").as_array()) {
+        auto value = v.value<std::string>();
+        if(value) {
+            templ.vars.emplace_back(*value);
+        }
+    }
+
+    for(auto& [p, c]: *t.at("files").as_table()) {
+        auto content = c.value<std::string>();
+        if(content) {
+            templ.files.emplace(p.data(), *content);
+        }
     }
 
     return templ;

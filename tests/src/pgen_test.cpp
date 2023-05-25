@@ -12,7 +12,12 @@ namespace fs = std::filesystem;
 TEST_CASE("Read template", "[read_template]") {
 
     auto templ_json =
-        R"({"vars":["app_name","file_name"],"files":{"src/main.cpp":"hello world main","src/{{app_name}}.hpp":"hello world header","src/{{app_name}}.cpp":"hello world impl"}})";
+        R"(vars = [ "app_name", "file_name" ]
+            [files]
+            "src/main.cpp" = "hello world main"
+            "src/{{app_name}}.hpp" = "hello world header"
+            "src/{{app_name}}.cpp" = "hello world impl"
+        )";
     auto templ_stream = std::stringstream{templ_json};
 
     auto templ = pgen::read_template(templ_stream);

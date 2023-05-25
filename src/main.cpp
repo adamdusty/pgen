@@ -1,3 +1,5 @@
+#define TOML_IMPLEMENTATION
+
 #include "lib.hpp"
 #include <argparse/argparse.hpp>
 #include <filesystem>
