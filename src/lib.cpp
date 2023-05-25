@@ -56,18 +56,23 @@ auto render_content(const std::unordered_map<fs::path, std::string> files,
     return rendered;
 }
 
-auto write_files(const fs::path root, const std::unordered_map<fs::path, std::string> files) -> void {
+auto write_files(const fs::path root, const std::unordered_map<fs::path, std::string> files) -> write_result {
     // TODO: Implement
 
     if(fs::exists(root)) {
-        return;
+        return {false, "Root path already exists."};
     }
 
-    fs::create_directory(root);
+    if(!fs::create_directory(root)) {
+        return {false, "Unable to create root directory"};
+    }
 
     for(auto& [relpath, content]: files) {
         if(!fs::exists(root / relpath.parent_path())) {
-            fs::create_directory(root / relpath.parent_path());
+            auto created = fs::create_directory(root / relpath.parent_path());
+            if(!created) {
+                return {false, fmt::format("Unable to create directory: {}", relpath.parent_path().string())};
+            }
         }
 
         auto path = root / relpath;
@@ -75,6 +80,8 @@ auto write_files(const fs::path root, const std::unordered_map<fs::path, std::st
         file << content;
         file.close();
     }
+
+    return {true, "Files written successfully"};
 }
 
 } // namespace pgen

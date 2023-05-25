@@ -24,9 +24,17 @@ auto main(int argc, char** argv) -> int {
         return 1;
     }
 
+    auto dest          = fs::path{program.get<std::string>("dest")};
     auto template_path = fs::path{program.get<std::string>("--template")};
+
+    if(fs::exists(dest)) {
+        fmt::println("Destination directory already exists.");
+        return 1;
+    }
+
     if(!fs::exists(template_path)) {
         fmt::println("ERROR: Template file not found: {}", template_path.string());
+        return 1;
     }
 
     auto template_file_stream = std::ifstream{template_path};
@@ -41,9 +49,8 @@ auto main(int argc, char** argv) -> int {
         values.emplace(v, line);
     }
 
-    for(auto [k, v]: values) {
-        fmt::println("{}: {}", k, v);
-    }
+    auto rendered = pgen::render_content(templ.files, values);
+    auto result   = pgen::write_files(dest, rendered);
 
     return 0;
 }
