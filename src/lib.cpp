@@ -57,8 +57,6 @@ auto render_content(const std::unordered_map<fs::path, std::string> files,
 }
 
 auto write_files(const fs::path root, const std::unordered_map<fs::path, std::string> files) -> write_result {
-    // TODO: Implement
-
     if(fs::exists(root)) {
         return {false, "Root path already exists."};
     }
