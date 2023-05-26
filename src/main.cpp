@@ -63,5 +63,18 @@ auto main(int argc, char** argv) -> int {
 
     fmt::println("{}", result.msg);
 
+    if(!result.success) {
+        fmt::println("Generation unsuccessful. Would you like to remove the directory and all files at [Y/n]: {}",
+                     dest.string());
+
+        auto line = std::string{};
+        std::getline(std::cin, line);
+        std::transform(line.begin(), line.end(), line.begin(), [](auto c) { return std::tolower(c); });
+        if(line == "y" || line == "") {
+            fmt::println("Removing directory: {}", dest.string());
+            fs::remove_all(dest);
+        }
+    }
+
     return 0;
 }
