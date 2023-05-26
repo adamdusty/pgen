@@ -11,7 +11,7 @@ namespace fs = std::filesystem;
 
 TEST_CASE("Read template", "[read_template]") {
 
-    auto templ_json =
+    auto templ_toml =
         R"(vars = [ "app_name", "file_name" ]
             [[files]]
             path = "src/main.cpp"
@@ -23,8 +23,8 @@ TEST_CASE("Read template", "[read_template]") {
             path = "src/{{app_name}}.cpp"
             content = "hello world impl"
         )";
-    auto templ_stream = std::stringstream{templ_json};
-    auto templ        = pgen::read_template(templ_stream);
+    auto templ_stream = std::stringstream{templ_toml};
+    auto templ        = *pgen::read_template(templ_stream);
 
     CHECK_FALSE(templ.files.find("src/main.cpp") == templ.files.end());
     CHECK_FALSE(templ.files.find("src/{{app_name}}.hpp") == templ.files.end());
@@ -35,6 +35,77 @@ TEST_CASE("Read template", "[read_template]") {
     CHECK(templ.files.at("src/{{app_name}}.cpp") == "hello world impl");
     CHECK_FALSE(std::find(templ.vars.begin(), templ.vars.end(), "app_name") == templ.vars.end());
     CHECK_FALSE(std::find(templ.vars.begin(), templ.vars.end(), "file_name") == templ.vars.end());
+}
+
+TEST_CASE("Read template with non-string vars array", "[read_template]") {
+    auto templ_toml = R"(
+        vars = [1, 2, 3, "apple"]
+        [[files]]
+        path = "src/main.cpp"
+        content = "hello world"
+    )";
+
+    auto templ_stream = std::stringstream{templ_toml};
+    auto templ_opt    = pgen::read_template(templ_stream);
+
+    CHECK_FALSE(templ_opt);
+}
+
+TEST_CASE("Read template with non-string files array", "[read_template]") {
+    auto templ_toml = R"(
+        vars = ["apple"]
+        [[files]]
+        path = 1
+        content = "hello world"
+    )";
+
+    auto templ_stream = std::stringstream{templ_toml};
+    auto templ_opt    = pgen::read_template(templ_stream);
+
+    CHECK_FALSE(templ_opt);
+}
+
+TEST_CASE("Read template missing vars array", "[read_template]") {
+    auto templ_toml = R"(
+        [[files]]
+        path = "src/main.cpp"
+        content = "hello world"
+    )";
+
+    auto templ_stream = std::stringstream{templ_toml};
+    auto templ_opt    = pgen::read_template(templ_stream);
+
+    CHECK(templ_opt);
+}
+
+TEST_CASE("Read template files entry is not an array", "[read_template]") {
+    auto templ_toml = R"(
+        vars = ["one", "two"]
+        [files]
+        path = "src/main.cpp"
+        content = "hello world"
+    )";
+
+    auto templ_stream = std::stringstream{templ_toml};
+    auto templ_opt    = pgen::read_template(templ_stream);
+
+    CHECK_FALSE(templ_opt);
+}
+
+TEST_CASE("Read template vars entry is not an array", "[read_template]") {
+    auto templ_toml = R"(
+        [vars]
+        var1 = 1
+        var2 = 2
+        [files]
+        path = "src/main.cpp"
+        content = "hello world"
+    )";
+
+    auto templ_stream = std::stringstream{templ_toml};
+    auto templ_opt    = pgen::read_template(templ_stream);
+
+    CHECK_FALSE(templ_opt);
 }
 
 TEST_CASE("Render Content", "[render_content]") {

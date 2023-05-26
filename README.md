@@ -4,7 +4,7 @@ Personal utility for generating projects.
 
 ## Todo
 
-- [ ] Error checking/handling during template reading
+- [x] Error checking/handling during template reading
 - [ ] Error checking/handling during rendering
 - [ ] Remove directory if generation fails
 - [ ] Ability to generate template from existing directory (Make creating template easier)

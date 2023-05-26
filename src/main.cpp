@@ -40,8 +40,15 @@ auto main(int argc, char** argv) -> int {
     }
 
     auto template_file_stream = std::ifstream{template_path};
-    auto templ                = pgen::read_template(template_file_stream);
-    auto values               = std::unordered_map<std::string, std::string>{};
+    auto templ_opt            = pgen::read_template(template_file_stream);
+    if(!templ_opt) {
+        fmt::println("Error reading template");
+        return 1;
+    }
+
+    auto templ = *templ_opt;
+
+    auto values = std::unordered_map<std::string, std::string>{};
 
     fmt::println("Enter values");
     for(auto& v: templ.vars) {
