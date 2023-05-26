@@ -28,10 +28,12 @@ auto read_template(std::istream& templ_str) -> project_template {
         }
     }
 
-    for(auto& [p, c]: *t.at("files").as_table()) {
-        auto content = c.value<std::string>();
-        if(content) {
-            templ.files.emplace(p.data(), *content);
+    for(auto& f: *t.at("files").as_array()) {
+        auto file    = f.as_table();
+        auto path    = file->at("path").value<std::string>();
+        auto content = file->at("content").value<std::string>();
+        if(path && content) {
+            templ.files.emplace(*path, *content);
         }
     }
 

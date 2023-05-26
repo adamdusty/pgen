@@ -13,14 +13,18 @@ TEST_CASE("Read template", "[read_template]") {
 
     auto templ_json =
         R"(vars = [ "app_name", "file_name" ]
-            [files]
-            "src/main.cpp" = "hello world main"
-            "src/{{app_name}}.hpp" = "hello world header"
-            "src/{{app_name}}.cpp" = "hello world impl"
+            [[files]]
+            path = "src/main.cpp"
+            content = "hello world main"
+            [[files]]
+            path = "src/{{app_name}}.hpp"
+            content = "hello world header"
+            [[files]]
+            path = "src/{{app_name}}.cpp"
+            content = "hello world impl"
         )";
     auto templ_stream = std::stringstream{templ_json};
-
-    auto templ = pgen::read_template(templ_stream);
+    auto templ        = pgen::read_template(templ_stream);
 
     CHECK_FALSE(templ.files.find("src/main.cpp") == templ.files.end());
     CHECK_FALSE(templ.files.find("src/{{app_name}}.hpp") == templ.files.end());
