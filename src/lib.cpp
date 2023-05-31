@@ -1,5 +1,6 @@
 #include "lib.hpp"
 
+#include "inja.hpp"
 #include <algorithm>
 #include <fmt/format.h>
 #include <fstream>
@@ -123,26 +124,17 @@ auto render_content(const std::unordered_map<fs::path, std::string> files,
                     const std::unordered_map<std::string, std::string> values)
     -> std::unordered_map<fs::path, std::string> {
 
-    auto rendered    = std::unordered_map<fs::path, std::string>{};
-    auto match       = std::smatch{};
-    auto ident_regex = std::regex{R"(\{\{\s*([_a-zA-Z][_a-zA-Z0-9]+)\s*\}\})", std::regex_constants::ECMAScript};
+    auto json_defs = inja::json{};
+    for(auto& [k, v]: values) {
+        json_defs.emplace(k, v);
+    }
+
+    auto rendered = std::unordered_map<fs::path, std::string>{};
 
     for(auto& [file, content]: files) {
-        auto file_path        = file.string();
-        auto rendered_path    = file.string();
-        auto rendered_content = content;
-
-        while(std::regex_search(rendered_path, match, ident_regex)) {
-            rendered_path = std::regex_replace(
-                rendered_path, ident_regex, values.at(match[1].str()), std::regex_constants::format_first_only);
-        }
-
-        while(std::regex_search(rendered_content, match, ident_regex)) {
-            rendered_content = std::regex_replace(
-                rendered_content, ident_regex, values.at(match[1].str()), std::regex_constants::format_first_only);
-        }
-
-        rendered.emplace(rendered_path, rendered_content);
+        auto rendered_file    = inja::render(file.string(), json_defs);
+        auto rendered_content = inja::render(content, json_defs);
+        rendered.emplace(rendered_file, rendered_content);
     }
 
     return rendered;
