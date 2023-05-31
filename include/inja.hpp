@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#pragma warning(push, 0)
 #ifndef INCLUDE_INJA_INJA_HPP_
 #define INCLUDE_INJA_INJA_HPP_
 
@@ -2939,3 +2940,5 @@ inline void render_to(std::ostream& os, std::string_view input, const json& data
 // #include "template.hpp"
 
 #endif // INCLUDE_INJA_INJA_HPP_
+
+#pragma warning(pop)

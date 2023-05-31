@@ -14,6 +14,8 @@ namespace fs = std::filesystem;
 struct project_template {
     std::vector<std::string> vars;
     std::unordered_map<fs::path, std::string> files;
+    std::vector<std::string> pregen_commands;
+    std::vector<std::string> postgen_commands;
 };
 
 struct write_result {

@@ -19,6 +19,11 @@ auto main(int argc, char** argv) -> int {
 
     program.add_argument("dest").help("Destination directory for project.");
     program.add_argument("-t", "--template").help("Project template json file").required();
+    program.add_argument("-c", "--commands")
+        .help("Run template commands.")
+        .help("Potentially dangerous. Only enable commands if from a trusted source.")
+        .default_value(false)
+        .implicit_value(true);
 
     try {
         program.parse_args(argc, argv);
@@ -30,6 +35,7 @@ auto main(int argc, char** argv) -> int {
 
     auto dest          = fs::path{program.get<std::string>("dest")};
     auto template_path = fs::path{program.get<std::string>("--template")};
+    auto commands      = program.get<bool>("--commands");
 
     if(fs::exists(dest)) {
         fmt::println("Destination directory already exists.");
@@ -71,7 +77,20 @@ auto main(int argc, char** argv) -> int {
         fmt::println("Exiting...");
         return 1;
     }
+
+    if(commands) {
+        for(auto& c: templ.pregen_commands) {
+            std::system(c.c_str());
+        }
+    }
+
     auto result = pgen::write_files(dest, rendered);
+
+    if(commands) {
+        for(auto& c: templ.postgen_commands) {
+            std::system(c.c_str());
+        }
+    }
 
     fmt::println("{}", result.msg);
 

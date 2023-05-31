@@ -24,6 +24,12 @@ target_include_directories(
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>"
 )
 
+target_include_directories(
+    pgen_lib SYSTEM
+    PUBLIC
+    "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
+)
+
 target_link_libraries(pgen_lib PUBLIC fmt::fmt tomlplusplus::tomlplusplus argparse::argparse)
 
 add_executable(
