@@ -65,6 +65,36 @@ auto validate_template(const toml::table tbl) -> bool {
         return false;
     }
 
+    // Validate pregen commands
+    if(tbl.find("pregen_commands") != tbl.end()) {
+        if(auto pregen = tbl.at("pregen_commands").as_array()) {
+            for(auto& c: *pregen) {
+                if(!c.value<std::string>()) {
+                    // Command is not a string
+                    return false;
+                }
+            }
+        } else {
+            // Pregen commands cannot be cast to array
+            return false;
+        }
+    }
+
+    // Validate postgen commands
+    if(tbl.find("postgen_commands") != tbl.end()) {
+        if(auto postgen = tbl.at("postgen_commands").as_array()) {
+            for(auto& c: *postgen) {
+                if(!c.value<std::string>()) {
+                    // Command is not a string
+                    return false;
+                }
+            }
+        } else {
+            // Postgen commands cannot be cast to array
+            return false;
+        }
+    }
+
     // No validation issues
     return true;
 }
@@ -90,10 +120,10 @@ auto read_template(std::istream& templ_str) -> std::optional<project_template> {
         auto vars = t.at("vars").as_array();
         for(auto& v: *vars) {
             auto value = v.value<std::string>();
-            if(!value) {
-                fmt::println("Error in vars array. Non-string var.");
-                return std::nullopt;
-            }
+            // if(!value) {
+            //     fmt::println("Error in vars array. Non-string var.");
+            //     return std::nullopt;
+            // }
 
             templ.vars.emplace_back(*value);
         }
@@ -115,6 +145,18 @@ auto read_template(std::istream& templ_str) -> std::optional<project_template> {
         }
 
         templ.files.emplace(*path, *content);
+    }
+
+    if(t.find("pregen_commands") != t.end()) {
+        for(auto& c: *t.at("pregen_commands").as_array()) {
+            templ.pregen_commands.emplace_back(*c.value<std::string>());
+        }
+    }
+
+    if(t.find("postgen_commands") != t.end()) {
+        for(auto& c: *t.at("pregen_commands").as_array()) {
+            templ.postgen_commands.emplace_back(*c.value<std::string>());
+        }
     }
 
     return templ;

@@ -20,8 +20,7 @@ auto main(int argc, char** argv) -> int {
     program.add_argument("dest").help("Destination directory for project.");
     program.add_argument("-t", "--template").help("Project template json file").required();
     program.add_argument("-c", "--commands")
-        .help("Run template commands.")
-        .help("Potentially dangerous. Only enable commands if from a trusted source.")
+        .help("DANGEROUS: Enable template commands. Only enable commands if from a trusted source.")
         .default_value(false)
         .implicit_value(true);
 

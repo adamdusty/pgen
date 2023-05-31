@@ -108,6 +108,47 @@ TEST_CASE("Read template vars entry is not an array", "[read_template]") {
     CHECK_FALSE(templ_opt);
 }
 
+TEST_CASE("Read template with pregen commands", "[read_template]") {
+    auto templ_toml = R"(
+        vars = ["one", "two"]
+        pregen_commands = ["ls .", "git init {{ directory }}"]
+        
+        [[files]]
+        path = "src/main.cpp"
+        content = "hello world"
+    )";
+
+    auto templ_stream = std::stringstream{templ_toml};
+    auto templ_opt    = pgen::read_template(templ_stream);
+    auto templ        = *templ_opt;
+
+    CHECK_FALSE(std::find(templ.pregen_commands.begin(), templ.pregen_commands.end(), "ls .") ==
+                templ.pregen_commands.end());
+    CHECK_FALSE(std::find(templ.pregen_commands.begin(), templ.pregen_commands.end(), "git init {{ directory }}") ==
+                templ.pregen_commands.end());
+}
+
+TEST_CASE("Read template with postgen commands", "[read_template]") {
+    auto templ_toml = R"(
+        vars = ["one", "two"]
+        pregen_commands = ["ls .", "git init {{ directory }}"]
+        postgen_commands = ["ls .", "git init {{ directory }}"]
+        
+        [[files]]
+        path = "src/main.cpp"
+        content = "hello world"
+    )";
+
+    auto templ_stream = std::stringstream{templ_toml};
+    auto templ_opt    = pgen::read_template(templ_stream);
+    auto templ        = *templ_opt;
+
+    CHECK_FALSE(std::find(templ.postgen_commands.begin(), templ.postgen_commands.end(), "ls .") ==
+                templ.postgen_commands.end());
+    CHECK_FALSE(std::find(templ.postgen_commands.begin(), templ.postgen_commands.end(), "git init {{ directory }}") ==
+                templ.postgen_commands.end());
+}
+
 TEST_CASE("Render Content", "[render_content]") {
 
     auto files  = std::unordered_map<fs::path, std::string>{};
