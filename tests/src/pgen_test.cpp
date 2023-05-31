@@ -186,6 +186,13 @@ TEST_CASE("Render Content", "[render_content]") {
         CHECK(rendered.at("src/file1.cpp") == "hello WORLD");
         CHECK(rendered.at("src/file2.cpp") == "hello world 2");
     }
+
+    SECTION("Render throws when variable not present", "[render_content]") {
+        files.emplace("src/{{file1_name}}.cpp", "hello {{upper(planet)}}");
+        files.emplace("src/{{file2_name}}.cpp", "{{lower(greeting)}} world 2");
+
+        CHECK_THROWS(pgen::render_content(files, values));
+    }
 }
 
 TEST_CASE("Writing files", "[write_files]") {

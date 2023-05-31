@@ -1,5 +1,6 @@
 #define TOML_IMPLEMENTATION
 
+#include "inja.hpp"
 #include "lib.hpp"
 #include <argparse/argparse.hpp>
 #include <filesystem>
@@ -22,7 +23,8 @@ auto main(int argc, char** argv) -> int {
     try {
         program.parse_args(argc, argv);
     } catch(const std::runtime_error& err) {
-        fmt::println("ERROR: {}", err.what());
+        fmt::println("Error parsing arguments: {}", err.what());
+        fmt::println("Exiting...");
         return 1;
     }
 
@@ -31,11 +33,13 @@ auto main(int argc, char** argv) -> int {
 
     if(fs::exists(dest)) {
         fmt::println("Destination directory already exists.");
+        fmt::println("Exiting...");
         return 1;
     }
 
     if(!fs::exists(template_path)) {
         fmt::println("ERROR: Template file not found: {}", template_path.string());
+        fmt::println("Exiting...");
         return 1;
     }
 
@@ -43,6 +47,7 @@ auto main(int argc, char** argv) -> int {
     auto templ_opt            = pgen::read_template(template_file_stream);
     if(!templ_opt) {
         fmt::println("Error reading template");
+        fmt::println("Exiting...");
         return 1;
     }
 
@@ -58,8 +63,15 @@ auto main(int argc, char** argv) -> int {
         values.emplace(v, line);
     }
 
-    auto rendered = pgen::render_content(templ.files, values);
-    auto result   = pgen::write_files(dest, rendered);
+    auto rendered = std::unordered_map<fs::path, std::string>{};
+    try {
+        rendered = pgen::render_content(templ.files, values);
+    } catch(const inja::InjaError& err) {
+        fmt::println("Error rendering data: {}", err.what());
+        fmt::println("Exiting...");
+        return 1;
+    }
+    auto result = pgen::write_files(dest, rendered);
 
     fmt::println("{}", result.msg);
 
