@@ -120,11 +120,6 @@ auto read_template(std::istream& templ_str) -> std::optional<project_template> {
         auto vars = t.at("vars").as_array();
         for(auto& v: *vars) {
             auto value = v.value<std::string>();
-            // if(!value) {
-            //     fmt::println("Error in vars array. Non-string var.");
-            //     return std::nullopt;
-            // }
-
             templ.vars.emplace_back(*value);
         }
     }
