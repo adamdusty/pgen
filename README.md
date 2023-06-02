@@ -14,3 +14,28 @@ Personal utility for generating projects.
 - [x] Add support for proper rendering with some functionality for dynamic templates
   - Currently if you want an uppercase and lowercase version of the same variable the user has to enter both. It would be better if the template designer could just designate a variable and manipulate in the template.
 - [x] Add support for post and pre render commands
+- [ ] Add clear warning when enabling commands
+
+## Build & install from source
+
+Requirements:
+
+- [fmt](https://github.com/fmtlib/fmt) 10.0.0
+- [argprage](https://github.com/p-ranav/argparse) master
+- [tomlplusplus](https://github.com/marzer/tomlplusplus) master
+
+```cmake
+cmake --preset release
+cmake --build --preset release
+cmake --install build/release
+```
+
+## Usage
+
+`pgen destination [-t|--template] "template_path" (-c|--commands)`  
+`pgen ~/dev/new_proj -t ~/pgen/templates/cpp-exe.toml`
+
+Use the -c or --commands flag to enable any commands defined in the template. Don't enable commands for templates you don't trust or understand. Potentially harmful.
+
+`pgen ~/dev/new_proj -t ~/pgen/templates/cpp-exe.toml -c`  
+`pgen ~/dev/new_proj -t ~/pgen/templates/cpp-exe.toml --commands`
