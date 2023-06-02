@@ -1,3 +1,4 @@
+#include <fmt/core.h>
 #define TOML_IMPLEMENTATION
 
 #include "inja.hpp"
@@ -35,6 +36,18 @@ auto main(int argc, char** argv) -> int {
     auto dest          = fs::path{program.get<std::string>("dest")};
     auto template_path = fs::path{program.get<std::string>("--template")};
     auto commands      = program.get<bool>("--commands");
+
+    if(commands) {
+        std::string line;
+        fmt::println("Are you sure you'd like to enable commands? Templates can specify any arbitrary string as a "
+                     "command. Make sure you've reviewed any commands defined in the template ({}): [y/N]",
+                     template_path.string());
+        std::getline(std::cin, line);
+        std::transform(line.begin(), line.end(), line.begin(), [](auto c) { return std::tolower(c); });
+        if(line == "n" || line == "") {
+            return 0;
+        }
+    }
 
     if(fs::exists(dest)) {
         fmt::println("Destination directory already exists.");
