@@ -13,4 +13,4 @@ Personal utility for generating projects.
 - [ ] Data for variable descriptions/documentation in template
 - [x] Add support for proper rendering with some functionality for dynamic templates
   - Currently if you want an uppercase and lowercase version of the same variable the user has to enter both. It would be better if the template designer could just designate a variable and manipulate in the template.
-- [ ] Add support for post and pre render commands
+- [x] Add support for post and pre render commands
