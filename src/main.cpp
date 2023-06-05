@@ -1,4 +1,3 @@
-#include <fmt/core.h>
 #define TOML_IMPLEMENTATION
 
 #include "inja.hpp"
