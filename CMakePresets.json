@@ -30,7 +30,7 @@
                 "CMAKE_CXX_STANDARD": "20",
                 "CMAKE_COLOR_DIAGNOSTICS": "ON",
                 "CMAKE_BUILD_TYPE": "release",
-                "BUILD_SHARED_LIBS": "ON"
+                "BUILD_SHARED_LIBS": "OFF"
             }
         }
     ]
