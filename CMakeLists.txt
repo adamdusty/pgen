@@ -30,11 +30,13 @@ target_include_directories(
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
 )
 
-target_precompile_headers(
-    pgen_lib PUBLIC
-    "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>/inja.hpp"
-    "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>/json.hpp"
-)
+if(PGEN_PRECOMPILE_HEADERS)
+    target_precompile_headers(
+        pgen_lib PUBLIC
+        "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>/inja.hpp"
+        "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>/json.hpp"
+    )
+endif()
 
 target_link_libraries(pgen_lib PUBLIC fmt::fmt tomlplusplus::tomlplusplus argparse::argparse)
 
