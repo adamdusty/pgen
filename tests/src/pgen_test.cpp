@@ -17,22 +17,22 @@ TEST_CASE("Read template", "[read_template]") {
             path = "src/main.cpp"
             content = "hello world main"
             [[files]]
-            path = "src/{*app_name*}.hpp"
+            path = "src/{{app_name}}.hpp"
             content = "hello world header"
             [[files]]
-            path = "src/{*app_name*}.cpp"
+            path = "src/{{app_name}}.cpp"
             content = "hello world impl"
         )";
     auto templ_stream = std::stringstream{templ_toml};
     auto templ        = *pgen::read_template(templ_stream);
 
     CHECK_FALSE(templ.files.find("src/main.cpp") == templ.files.end());
-    CHECK_FALSE(templ.files.find("src/{*app_name*}.hpp") == templ.files.end());
-    CHECK_FALSE(templ.files.find("src/{*app_name*}.cpp") == templ.files.end());
+    CHECK_FALSE(templ.files.find("src/{{app_name}}.hpp") == templ.files.end());
+    CHECK_FALSE(templ.files.find("src/{{app_name}}.cpp") == templ.files.end());
 
     CHECK(templ.files.at("src/main.cpp") == "hello world main");
-    CHECK(templ.files.at("src/{*app_name*}.hpp") == "hello world header");
-    CHECK(templ.files.at("src/{*app_name*}.cpp") == "hello world impl");
+    CHECK(templ.files.at("src/{{app_name}}.hpp") == "hello world header");
+    CHECK(templ.files.at("src/{{app_name}}.cpp") == "hello world impl");
     CHECK_FALSE(std::find(templ.vars.begin(), templ.vars.end(), "app_name") == templ.vars.end());
     CHECK_FALSE(std::find(templ.vars.begin(), templ.vars.end(), "file_name") == templ.vars.end());
 }
@@ -111,7 +111,7 @@ TEST_CASE("Read template vars entry is not an array", "[read_template]") {
 TEST_CASE("Read template with pregen commands", "[read_template]") {
     auto templ_toml = R"(
         vars = ["one", "two"]
-        pregen_commands = ["ls .", "git init {* directory *}"]
+        pregen_commands = ["ls .", "git init {{ directory }}"]
         
         [[files]]
         path = "src/main.cpp"
@@ -124,15 +124,15 @@ TEST_CASE("Read template with pregen commands", "[read_template]") {
 
     CHECK_FALSE(std::find(templ.pregen_commands.begin(), templ.pregen_commands.end(), "ls .") ==
                 templ.pregen_commands.end());
-    CHECK_FALSE(std::find(templ.pregen_commands.begin(), templ.pregen_commands.end(), "git init {* directory *}") ==
+    CHECK_FALSE(std::find(templ.pregen_commands.begin(), templ.pregen_commands.end(), "git init {{ directory }}") ==
                 templ.pregen_commands.end());
 }
 
 TEST_CASE("Read template with postgen commands", "[read_template]") {
     auto templ_toml = R"(
         vars = ["one", "two"]
-        pregen_commands = ["ls .", "git init {* directory *}"]
-        postgen_commands = ["ls .", "git init {* directory *}"]
+        pregen_commands = ["ls .", "git init {{ directory }}"]
+        postgen_commands = ["ls .", "git init {{ directory }}"]
         
         [[files]]
         path = "src/main.cpp"
@@ -145,7 +145,7 @@ TEST_CASE("Read template with postgen commands", "[read_template]") {
 
     CHECK_FALSE(std::find(templ.postgen_commands.begin(), templ.postgen_commands.end(), "ls .") ==
                 templ.postgen_commands.end());
-    CHECK_FALSE(std::find(templ.postgen_commands.begin(), templ.postgen_commands.end(), "git init {* directory *}") ==
+    CHECK_FALSE(std::find(templ.postgen_commands.begin(), templ.postgen_commands.end(), "git init {{ directory }}") ==
                 templ.postgen_commands.end());
 }
 
@@ -155,10 +155,10 @@ TEST_CASE("Render Content", "[render_content]") {
     auto values = std::unordered_map<std::string, std::string>{};
 
     SECTION("Renders file name, no content substitution", "[render_content]") {
-        files.emplace("src/{*file1_name*}.cpp", "hello world 1");
-        files.emplace("src/{*file2_name*}.cpp", "hello world 2");
-        files.emplace("src/{* file3_name *}.cpp", "hello world 3");
-        files.emplace("src/{*  file4_name  *}.cpp", "hello world 4");
+        files.emplace("src/{{file1_name}}.cpp", "hello world 1");
+        files.emplace("src/{{file2_name}}.cpp", "hello world 2");
+        files.emplace("src/{{ file3_name }}.cpp", "hello world 3");
+        files.emplace("src/{{  file4_name  }}.cpp", "hello world 4");
 
         values.emplace("file1_name", "file1");
         values.emplace("file2_name", "file2");
@@ -174,7 +174,7 @@ TEST_CASE("Render Content", "[render_content]") {
     }
 
     SECTION("Multiple values in file name", "[render_content]") {
-        files.emplace("src/{*dir1*}/{*file1_name*}.cpp", "hello world 1");
+        files.emplace("src/{{dir1}}/{{file1_name}}.cpp", "hello world 1");
 
         values.emplace("file1_name", "file1");
         values.emplace("dir1", "subdir");
@@ -185,7 +185,7 @@ TEST_CASE("Render Content", "[render_content]") {
     }
 
     SECTION("Multiple values in content", "[render_content]") {
-        files.emplace("src/file.cpp", "{*greeting*} {* planet *}");
+        files.emplace("src/file.cpp", "{{greeting}} {{ planet }}");
 
         values.emplace("greeting", "hello");
         values.emplace("planet", "world");
@@ -197,8 +197,8 @@ TEST_CASE("Render Content", "[render_content]") {
     }
 
     SECTION("Renders files & content", "[render_content]") {
-        files.emplace("src/{*file1_name*}.cpp", "hello {*planet*}");
-        files.emplace("src/{*file2_name*}.cpp", "{*greeting*} world 2");
+        files.emplace("src/{{file1_name}}.cpp", "hello {{planet}}");
+        files.emplace("src/{{file2_name}}.cpp", "{{greeting}} world 2");
         values.emplace("file1_name", "file1");
         values.emplace("file2_name", "file2");
         values.emplace("planet", "world");
@@ -213,8 +213,8 @@ TEST_CASE("Render Content", "[render_content]") {
     }
 
     SECTION("Render upper and lower", "[render_content]") {
-        files.emplace("src/{*file1_name*}.cpp", "hello {*upper(planet)*}");
-        files.emplace("src/{*file2_name*}.cpp", "{*lower(greeting)*} world 2");
+        files.emplace("src/{{file1_name}}.cpp", "hello {{upper(planet)}}");
+        files.emplace("src/{{file2_name}}.cpp", "{{lower(greeting)}} world 2");
         values.emplace("file1_name", "file1");
         values.emplace("file2_name", "file2");
         values.emplace("planet", "world");
@@ -229,20 +229,10 @@ TEST_CASE("Render Content", "[render_content]") {
     }
 
     SECTION("Render throws when variable not present", "[render_content]") {
-        files.emplace("src/{*file1_name*}.cpp", "hello {*upper(planet)*}");
-        files.emplace("src/{*file2_name*}.cpp", "{*lower(greeting)*} world 2");
+        files.emplace("src/{{file1_name}}.cpp", "hello {{upper(planet)}}");
+        files.emplace("src/{{file2_name}}.cpp", "{{lower(greeting)}} world 2");
 
         CHECK_THROWS(pgen::render_content(files, values));
-    }
-
-    SECTION("Render capable of rendering content with cmake variable syntax.", "[render_content]") {
-        files.emplace("src/{*libname*}.cmake", "${{*libname*}_INSTALL_CMAKEDIR}");
-        values.emplace("libname", "name");
-
-        auto rendered = pgen::render_content(files, values);
-
-        REQUIRE(rendered.find("src/name.cmake") != rendered.end());
-        CHECK(rendered.at("src/name.cmake") == "${name_INSTALL_CMAKEDIR}");
     }
 }
 

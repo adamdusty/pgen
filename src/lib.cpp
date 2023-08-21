@@ -161,9 +161,6 @@ auto render_content(const std::unordered_map<fs::path, std::string> files,
                     const std::unordered_map<std::string, std::string> values)
     -> std::unordered_map<fs::path, std::string> {
 
-    auto env = inja::Environment{};
-    env.set_expression("{*", "*}");
-
     auto json_defs = inja::json{};
     for(auto& [k, v]: values) {
         json_defs.emplace(k, v);
@@ -172,8 +169,8 @@ auto render_content(const std::unordered_map<fs::path, std::string> files,
     auto rendered = std::unordered_map<fs::path, std::string>{};
 
     for(auto& [file, content]: files) {
-        auto rendered_file    = env.render(file.string(), json_defs);
-        auto rendered_content = env.render(content, json_defs);
+        auto rendered_file    = inja::render(file.string(), json_defs);
+        auto rendered_content = inja::render(content, json_defs);
         rendered.emplace(rendered_file, rendered_content);
     }
 
