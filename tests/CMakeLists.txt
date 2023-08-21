@@ -18,4 +18,8 @@ add_executable(pgen_tests
 
 target_link_libraries(pgen_tests PRIVATE pgen_lib Catch2::Catch2WithMain)
 
+if(PGEN_PRECOMPILE_HEADERS)
+    target_precompile_headers(pgen_tests REUSE_FROM pgen_lib)
+endif()
+
 add_test(NAME pgen_tests COMMAND pgen_tests)
