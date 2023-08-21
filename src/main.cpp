@@ -15,7 +15,7 @@ namespace ap = argparse;
 
 auto main(int argc, char** argv) -> int {
 
-    auto program = ap::ArgumentParser{"ProjectGen"};
+    auto program = ap::ArgumentParser{"ProjectGen", "0.1.0"};
 
     program.add_argument("dest").help("Destination directory for project.");
     program.add_argument("-t", "--template").help("Project template json file").required();
