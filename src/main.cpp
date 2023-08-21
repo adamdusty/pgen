@@ -28,6 +28,7 @@ auto main(int argc, char** argv) -> int {
         program.parse_args(argc, argv);
     } catch(const std::runtime_error& err) {
         fmt::println("Error parsing arguments: {}", err.what());
+        fmt::println("Use pgen --help for usage.");
         fmt::println("Exiting...");
         return 1;
     }
