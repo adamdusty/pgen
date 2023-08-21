@@ -18,12 +18,11 @@
                 "CMAKE_COLOR_DIAGNOSTICS": "ON",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "CMAKE_BUILD_TYPE": "debug",
-                "BUILD_SHARED_LIBS": "ON"
+                "BUILD_SHARED_LIBS": "OFF"
             }
         },
         {
-            "name": "cmake-release",
-            "hidden": true,
+            "name": "release",
             "binaryDir": "./build/release",
             "cacheVariables": {
                 "PGEN_TEST": "OFF",
@@ -34,6 +33,12 @@
                 "CMAKE_BUILD_TYPE": "release",
                 "BUILD_SHARED_LIBS": "OFF"
             }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "release",
+            "configurePreset": "release"
         }
     ]
 }

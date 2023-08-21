@@ -27,7 +27,7 @@ Requirements:
 
 ```cmake
 cmake --preset release
-cmake --build build
+cmake --build build/release
 cmake --install build/release
 ```
 
