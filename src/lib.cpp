@@ -6,12 +6,15 @@
 #include <fstream>
 #include <numeric>
 #include <optional>
+#include <ranges>
 #include <regex>
 #include <string>
 #include <toml++/toml.h>
 #include <vector>
 
 namespace pgen {
+
+namespace rv = std::ranges;
 
 auto validate_template(const toml::table tbl) -> bool {
     // Validate vars
@@ -149,7 +152,7 @@ auto read_template(std::istream& templ_str) -> std::optional<project_template> {
     }
 
     if(t.find("postgen_commands") != t.end()) {
-        for(auto& c: *t.at("pregen_commands").as_array()) {
+        for(auto& c: *t.at("postgen_commands").as_array()) {
             templ.postgen_commands.emplace_back(*c.value<std::string>());
         }
     }

@@ -131,7 +131,7 @@ TEST_CASE("Read template with pregen commands", "[read_template]") {
 TEST_CASE("Read template with postgen commands", "[read_template]") {
     auto templ_toml = R"(
         vars = ["one", "two"]
-        pregen_commands = ["ls .", "git init {* directory *}"]
+        pregen_commands = ["pregen_command", "ls .", "git init {* directory *}"]
         postgen_commands = ["ls .", "git init {* directory *}"]
         
         [[files]]
