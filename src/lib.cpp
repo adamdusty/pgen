@@ -14,8 +14,6 @@
 
 namespace pgen {
 
-namespace rv = std::ranges;
-
 auto validate_template(const toml::table tbl) -> bool {
     // Validate vars
     if(tbl.find("vars") != tbl.end()) {
