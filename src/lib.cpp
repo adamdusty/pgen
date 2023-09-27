@@ -2,6 +2,7 @@
 
 #include "inja.hpp"
 #include <algorithm>
+#include <fmt/core.h>
 #include <fmt/format.h>
 #include <fstream>
 #include <numeric>
@@ -14,26 +15,31 @@
 
 namespace pgen {
 
-auto validate_template(const toml::table tbl) -> bool {
+struct validation_result {
+    bool valid;
+    std::string msg;
+};
+
+auto validate_template(const toml::table tbl) -> validation_result {
     // Validate vars
     if(tbl.find("vars") != tbl.end()) {
         if(auto vars = tbl.at("vars").as_array()) {
             for(auto& v: *vars) {
                 if(!v.value<std::string>()) {
                     // Variable value can't be cast to a string
-                    return false;
+                    return {false, "Variable value cannot be cast to a string"};
                 }
             }
         } else {
             // Vars entry can't be cast to an array
-            return false;
+            return {false, "Vars entry can't be cast to an array"};
         }
     }
 
     // Validate files
     if(tbl.find("files") == tbl.end()) {
         // Template doesn't have a files array (nothing to generate)
-        return false;
+        return {false, "Template doesn't contain a `files` array (nothing to generate)."};
     }
 
     if(auto files = tbl.at("files").as_array()) {
@@ -41,29 +47,29 @@ auto validate_template(const toml::table tbl) -> bool {
             if(auto file_data = f.as_table()) {
                 if(file_data->find("path") == file_data->end()) {
                     // File doesn't have a path entry
-                    return false;
+                    return {false, "File entry doesn't declare a path."};
                 }
                 if(file_data->find("content") == file_data->end()) {
                     // File doesn't have a content entry
-                    return false;
+                    return {false, "File entry doesn't declare any content."};
                 }
 
                 if(!file_data->at("path").value<std::string>()) {
                     // File data path entry can't be cast to string
-                    return false;
+                    return {false, "File path can't be cast to a string."};
                 }
                 if(!file_data->at("content").value<std::string>()) {
                     // File data content entry can't be cast to string
-                    return false;
+                    return {false, "File content can't be cast to a string."};
                 }
             } else {
                 // File entry can't be cast to table
-                return false;
+                return {false, "File entry isn't a table."};
             }
         }
     } else {
         // Files entry can't be cast to an array
-        return false;
+        return {false, "`files` is not an array."};
     }
 
     // Validate pregen commands
@@ -72,12 +78,12 @@ auto validate_template(const toml::table tbl) -> bool {
             for(auto& c: *pregen) {
                 if(!c.value<std::string>()) {
                     // Command is not a string
-                    return false;
+                    return {false, "Pregen command can't be cast to a string."};
                 }
             }
         } else {
             // Pregen commands cannot be cast to array
-            return false;
+            return {false, "Pregen commands is not an array."};
         }
     }
 
@@ -87,17 +93,17 @@ auto validate_template(const toml::table tbl) -> bool {
             for(auto& c: *postgen) {
                 if(!c.value<std::string>()) {
                     // Command is not a string
-                    return false;
+                    return {false, "Postgen command can't be cast to a string."};
                 }
             }
         } else {
             // Postgen commands cannot be cast to array
-            return false;
+            return {false, "Postgen commands is not an array."};
         }
     }
 
     // No validation issues
-    return true;
+    return {true};
 }
 
 auto read_template(std::istream& templ_str) -> std::optional<project_template> {
@@ -111,7 +117,9 @@ auto read_template(std::istream& templ_str) -> std::optional<project_template> {
         return std::nullopt;
     }
 
-    if(!validate_template(t)) {
+    auto validation = validate_template(t);
+    if(!validation.valid) {
+        fmt::println("Template invalid: {}", validation.msg);
         return std::nullopt;
     }
 
