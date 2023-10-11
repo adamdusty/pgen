@@ -1,0 +1,1 @@
+If templates were just retrevied from a directory, it would be possible to include templates in other templates, reducing duplication!

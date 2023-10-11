@@ -7,12 +7,10 @@
     },
     "configurePresets": [
         {
-            "name": "cmake-debug",
-            "hidden": true,
+            "name": "debug",
             "binaryDir": "./build/debug",
             "cacheVariables": {
-                "PGEN_TEST": "ON",
-                "PGEN_PRECOMPILE_HEADERS": "ON",
+                "PGEN_TEST": "OFF",
                 "CMAKE_CXX_EXTENSIONS": "OFF",
                 "CMAKE_CXX_STANDARD": "20",
                 "CMAKE_COLOR_DIAGNOSTICS": "ON",
@@ -26,19 +24,44 @@
             "binaryDir": "./build/release",
             "cacheVariables": {
                 "PGEN_TEST": "OFF",
-                "PGEN_PRECOMPILE_HEADERS": "OFF",
                 "CMAKE_CXX_EXTENSIONS": "OFF",
                 "CMAKE_CXX_STANDARD": "20",
                 "CMAKE_COLOR_DIAGNOSTICS": "ON",
                 "CMAKE_BUILD_TYPE": "release",
                 "BUILD_SHARED_LIBS": "OFF"
             }
+        },
+        {
+            "name": "dev",
+            "inherits": [
+                "debug"
+            ],
+            "cacheVariables": {
+                "PGEN_TEST": "ON"
+            }
         }
     ],
     "buildPresets": [
         {
+            "name": "dev",
+            "configurePreset": "dev"
+        },
+        {
+            "name": "debug",
+            "configurePreset": "debug"
+        },
+        {
             "name": "release",
             "configurePreset": "release"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "dev",
+            "configurePreset": "dev",
+            "output": {
+                "outputOnFailure": true
+            }
         }
     ]
 }
