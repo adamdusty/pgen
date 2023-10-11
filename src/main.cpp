@@ -43,8 +43,8 @@ auto main(int argc, char** argv) -> int {
                      "command. Make sure you've reviewed any commands defined in the template ({}): [y/N]",
                      template_path.string());
         std::getline(std::cin, line);
-        std::transform(line.begin(), line.end(), line.begin(), [](auto c) { return std::tolower(c); });
-        if(line == "n" || line == "") {
+        std::transform(line.begin(), line.end(), line.begin(), [](auto input) { return std::tolower(input); });
+        if(line == "n" || line.empty()) {
             return 0;
         }
     }
@@ -74,11 +74,11 @@ auto main(int argc, char** argv) -> int {
     auto values = std::unordered_map<std::string, std::string>{};
 
     fmt::println("Enter values");
-    for(auto& v: templ.vars) {
+    for(auto& var: templ.vars) {
         auto line = std::string{};
-        fmt::print("{}: ", v);
+        fmt::print("{}: ", var);
         std::getline(std::cin, line);
-        values.emplace(v, line);
+        values.emplace(var, line);
     }
 
     auto rendered = std::unordered_map<fs::path, std::string>{};
@@ -91,16 +91,16 @@ auto main(int argc, char** argv) -> int {
     }
 
     if(commands) {
-        for(auto& c: templ.pregen_commands) {
-            std::system(c.c_str());
+        for(auto& cmd: templ.pregen_commands) {
+            std::system(cmd.c_str()); // NOLINT
         }
     }
 
     auto result = pgen::write_files(dest, rendered);
 
     if(commands) {
-        for(auto& c: templ.postgen_commands) {
-            std::system(c.c_str());
+        for(auto& cmd: templ.postgen_commands) {
+            std::system(cmd.c_str()); // NOLINT
         }
     }
 
@@ -112,8 +112,8 @@ auto main(int argc, char** argv) -> int {
 
         auto line = std::string{};
         std::getline(std::cin, line);
-        std::transform(line.begin(), line.end(), line.begin(), [](auto c) { return std::tolower(c); });
-        if(line == "y" || line == "") {
+        std::transform(line.begin(), line.end(), line.begin(), [](auto input) { return std::tolower(input); });
+        if(line == "y" || line.empty()) {
             fmt::println("Removing directory: {}", dest.string());
             fs::remove_all(dest);
         }

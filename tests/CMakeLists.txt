@@ -10,16 +10,19 @@ if(PROJECT_IS_TOP_LEVEL)
     enable_testing()
 endif()
 
-find_package(Catch2 3 REQUIRED)
+include(FetchContent)
+FetchContent_Declare(
+    snitch
+    GIT_REPOSITORY https://github.com/cschreib/snitch.git
+    GIT_TAG        v1.2.2
+    FIND_PACKAGE_ARGS
+)
+FetchContent_MakeAvailable(snitch)
 
 add_executable(pgen_tests
     src/pgen_test.cpp
 )
 
-target_link_libraries(pgen_tests PRIVATE pgen_lib Catch2::Catch2WithMain)
-
-if(PGEN_PRECOMPILE_HEADERS)
-    target_precompile_headers(pgen_tests REUSE_FROM pgen_lib)
-endif()
+target_link_libraries(pgen_tests PRIVATE pgen_lib snitch::snitch)
 
 add_test(NAME pgen_tests COMMAND pgen_tests)

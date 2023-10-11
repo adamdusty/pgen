@@ -1,8 +1,10 @@
 #include "lib.hpp"
 #include <algorithm>
-#include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <fstream>
+#include <inja.hpp>
+#include <snitch/snitch.hpp>
+#include <snitch/snitch_macros_exceptions.hpp>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -232,7 +234,7 @@ TEST_CASE("Render Content", "[render_content]") {
         files.emplace("src/{*file1_name*}.cpp", "hello {*upper(planet)*}");
         files.emplace("src/{*file2_name*}.cpp", "{*lower(greeting)*} world 2");
 
-        CHECK_THROWS(pgen::render_content(files, values));
+        CHECK_THROWS_AS(pgen::render_content(files, values), inja::RenderError);
     }
 
     SECTION("Render capable of rendering content with cmake variable syntax.", "[render_content]") {

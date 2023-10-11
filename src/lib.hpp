@@ -24,9 +24,9 @@ struct write_result {
 };
 
 auto read_template(std::istream& templ_str) -> std::optional<project_template>;
-auto render_content(const std::unordered_map<fs::path, std::string> files,
-                    const std::unordered_map<std::string, std::string> values)
+auto render_content(const std::unordered_map<fs::path, std::string>& files,
+                    const std::unordered_map<std::string, std::string>& values)
     -> std::unordered_map<fs::path, std::string>;
-auto write_files(const fs::path root, const std::unordered_map<fs::path, std::string> files) -> write_result;
+auto write_files(const fs::path& root, const std::unordered_map<fs::path, std::string>& files) -> write_result;
 
 } // namespace pgen

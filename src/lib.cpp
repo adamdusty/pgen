@@ -20,12 +20,12 @@ struct validation_result {
     std::string msg;
 };
 
-auto validate_template(const toml::table tbl) -> validation_result {
+auto validate_template(const toml::table& tbl) -> validation_result {
     // Validate vars
     if(tbl.find("vars") != tbl.end()) {
-        if(auto vars = tbl.at("vars").as_array()) {
-            for(auto& v: *vars) {
-                if(!v.value<std::string>()) {
+        if(const auto* vars = tbl.at("vars").as_array()) {
+            for(const auto& var: *vars) {
+                if(!var.value<std::string>()) {
                     // Variable value can't be cast to a string
                     return {false, "Variable value cannot be cast to a string"};
                 }
@@ -42,9 +42,9 @@ auto validate_template(const toml::table tbl) -> validation_result {
         return {false, "Template doesn't contain a `files` array (nothing to generate)."};
     }
 
-    if(auto files = tbl.at("files").as_array()) {
-        for(auto& f: *files) {
-            if(auto file_data = f.as_table()) {
+    if(const auto* files = tbl.at("files").as_array()) {
+        for(const auto& file: *files) {
+            if(const auto* file_data = file.as_table()) {
                 if(file_data->find("path") == file_data->end()) {
                     // File doesn't have a path entry
                     return {false, "File entry doesn't declare a path."};
@@ -74,9 +74,9 @@ auto validate_template(const toml::table tbl) -> validation_result {
 
     // Validate pregen commands
     if(tbl.find("pregen_commands") != tbl.end()) {
-        if(auto pregen = tbl.at("pregen_commands").as_array()) {
-            for(auto& c: *pregen) {
-                if(!c.value<std::string>()) {
+        if(const auto* pregen = tbl.at("pregen_commands").as_array()) {
+            for(const auto& cmd: *pregen) {
+                if(!cmd.value<std::string>()) {
                     // Command is not a string
                     return {false, "Pregen command can't be cast to a string."};
                 }
@@ -89,9 +89,9 @@ auto validate_template(const toml::table tbl) -> validation_result {
 
     // Validate postgen commands
     if(tbl.find("postgen_commands") != tbl.end()) {
-        if(auto postgen = tbl.at("postgen_commands").as_array()) {
-            for(auto& c: *postgen) {
-                if(!c.value<std::string>()) {
+        if(const auto* postgen = tbl.at("postgen_commands").as_array()) {
+            for(const auto& cmd: *postgen) {
+                if(!cmd.value<std::string>()) {
                     // Command is not a string
                     return {false, "Postgen command can't be cast to a string."};
                 }
@@ -108,16 +108,16 @@ auto validate_template(const toml::table tbl) -> validation_result {
 
 auto read_template(std::istream& templ_str) -> std::optional<project_template> {
 
-    toml::table t;
+    toml::table table;
 
     try {
-        t = toml::parse(templ_str);
+        table = toml::parse(templ_str);
     } catch(toml::parse_error& err) {
         fmt::println("Error parsing template: {}", err.what());
         return std::nullopt;
     }
 
-    auto validation = validate_template(t);
+    auto validation = validate_template(table);
     if(!validation.valid) {
         fmt::println("Template invalid: {}", validation.msg);
         return std::nullopt;
@@ -125,18 +125,20 @@ auto read_template(std::istream& templ_str) -> std::optional<project_template> {
 
     auto templ = project_template{};
 
-    if(t.find("vars") != t.end()) {
-        auto vars = t.at("vars").as_array();
-        for(auto& v: *vars) {
-            auto value = v.value<std::string>();
-            templ.vars.emplace_back(*value);
+    if(table.find("vars") != table.end()) {
+        const auto* vars = table.at("vars").as_array();
+        for(const auto& var: *vars) {
+            auto value = var.value<std::string>();
+            if(value) {
+                templ.vars.emplace_back(*value);
+            }
         }
     }
 
-    for(auto& f: *t.at("files").as_array()) {
-        auto file    = f.as_table();
-        auto path    = file->at("path").value<std::string>();
-        auto content = file->at("content").value<std::string>();
+    for(auto& file_entry: *table.at("files").as_array()) {
+        const auto* file = file_entry.as_table();
+        auto path        = file->at("path").value<std::string>();
+        auto content     = file->at("content").value<std::string>();
         if(!path) {
             fmt::println("Error getting path from file object. Value cannot be cast to a string.");
             return std::nullopt;
@@ -151,36 +153,40 @@ auto read_template(std::istream& templ_str) -> std::optional<project_template> {
         templ.files.emplace(*path, *content);
     }
 
-    if(t.find("pregen_commands") != t.end()) {
-        for(auto& c: *t.at("pregen_commands").as_array()) {
-            templ.pregen_commands.emplace_back(*c.value<std::string>());
+    if(table.find("pregen_commands") != table.end()) {
+        for(auto& cmd: *table.at("pregen_commands").as_array()) {
+            if(auto cmd_value = cmd.value<std::string>()) {
+                templ.pregen_commands.emplace_back(*cmd_value);
+            }
         }
     }
 
-    if(t.find("postgen_commands") != t.end()) {
-        for(auto& c: *t.at("postgen_commands").as_array()) {
-            templ.postgen_commands.emplace_back(*c.value<std::string>());
+    if(table.find("postgen_commands") != table.end()) {
+        for(auto& cmd: *table.at("postgen_commands").as_array()) {
+            if(auto cmd_value = cmd.value<std::string>()) {
+                templ.postgen_commands.emplace_back(*cmd_value);
+            }
         }
     }
 
     return templ;
 }
 
-auto render_content(const std::unordered_map<fs::path, std::string> files,
-                    const std::unordered_map<std::string, std::string> values)
+auto render_content(const std::unordered_map<fs::path, std::string>& files,
+                    const std::unordered_map<std::string, std::string>& values)
     -> std::unordered_map<fs::path, std::string> {
 
     auto env = inja::Environment{};
     env.set_expression("{*", "*}");
 
     auto json_defs = inja::json{};
-    for(auto& [k, v]: values) {
+    for(const auto& [k, v]: values) {
         json_defs.emplace(k, v);
     }
 
     auto rendered = std::unordered_map<fs::path, std::string>{};
 
-    for(auto& [file, content]: files) {
+    for(const auto& [file, content]: files) {
         auto rendered_file    = env.render(file.string(), json_defs);
         auto rendered_content = env.render(content, json_defs);
         rendered.emplace(rendered_file, rendered_content);
@@ -189,7 +195,7 @@ auto render_content(const std::unordered_map<fs::path, std::string> files,
     return rendered;
 }
 
-auto write_files(const fs::path root, const std::unordered_map<fs::path, std::string> files) -> write_result {
+auto write_files(const fs::path& root, const std::unordered_map<fs::path, std::string>& files) -> write_result {
     if(fs::exists(root)) {
         return {false, "Root path already exists."};
     }
@@ -198,7 +204,7 @@ auto write_files(const fs::path root, const std::unordered_map<fs::path, std::st
         return {false, "Unable to create root directory"};
     }
 
-    for(auto& [relpath, content]: files) {
+    for(const auto& [relpath, content]: files) {
         if(!fs::exists(root / relpath.parent_path())) {
             auto created = fs::create_directories(root / relpath.parent_path());
             if(!created) {
