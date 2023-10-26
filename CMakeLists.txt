@@ -7,8 +7,7 @@ project(
     LANGUAGES CXX
 )
 
-option(PGEN_TEST "Build tests" OFF)
-
+include(cmake/build-options.cmake)
 include(cmake/variables.cmake)
 include(cmake/dependencies.cmake)
 
@@ -23,20 +22,13 @@ target_include_directories(
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>"
 )
 
-target_include_directories(
-    pgen_lib SYSTEM
-    PUBLIC
-    "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
-)
-
-target_link_libraries(pgen_lib PUBLIC fmt::fmt tomlplusplus::tomlplusplus argparse::argparse)
+target_link_libraries(pgen_lib PUBLIC fmt::fmt nlohmann_json::nlohmann_json pantor::inja)
 
 add_executable(
     pgen_exe
     src/main.cpp
 )
 
-target_compile_definitions(pgen_exe PRIVATE -DTOML_HEADER_ONLY=0)
 target_link_libraries(pgen_exe PRIVATE pgen_lib)
 
 set_target_properties(
@@ -50,7 +42,7 @@ if(NOT CMAKE_SKIP_INSTALL_RULES)
   include(cmake/install-rules.cmake)
 endif()
 
-if(PGEN_TEST)
+if(BUILD_PGEN_TESTS)
     include(CTest)
     add_subdirectory(tests)
 endif()

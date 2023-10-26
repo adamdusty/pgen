@@ -13,7 +13,8 @@ Checks: "*,\
   -modernize-use-nodiscard,\
   -misc-non-private-member-variables-in-classes,\
   -readability-named-parameter,\
-  -hicpp-named-parameter"
+  -hicpp-named-parameter, \
+  -readability-identifier-length"
 WarningsAsErrors: ''
 CheckOptions:
   - key: 'bugprone-argument-comment.StrictMode'

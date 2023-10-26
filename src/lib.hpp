@@ -1,7 +1,6 @@
 #pragma once
 
 #include <filesystem>
-#include <iostream>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -10,23 +9,30 @@
 namespace pgen {
 
 namespace fs = std::filesystem;
+using std::optional;
+using std::string;
+using std::unordered_map;
+using std::vector;
 
-struct project_template {
-    std::vector<std::string> vars;
-    std::unordered_map<fs::path, std::string> files;
-    std::vector<std::string> pregen_commands;
-    std::vector<std::string> postgen_commands;
-};
-
-struct write_result {
+struct result {
     bool success;
-    std::string msg;
+    string message;
+
+    explicit operator bool() const { return success; }
 };
 
-auto read_template(std::istream& templ_str) -> std::optional<project_template>;
-auto render_content(const std::unordered_map<fs::path, std::string>& files,
-                    const std::unordered_map<std::string, std::string>& values)
-    -> std::unordered_map<fs::path, std::string>;
-auto write_files(const fs::path& root, const std::unordered_map<fs::path, std::string>& files) -> write_result;
+struct point {
+    enum class point_type {
+        file,
+        directory,
+    };
+
+    point_type type = point_type::file;
+    fs::path path;
+    optional<string> content;
+};
+
+auto render(const unordered_map<string, string>& map, const vector<point>& points) -> vector<point>;
+auto write_points(const fs::path& root, const vector<point>& points) -> result;
 
 } // namespace pgen

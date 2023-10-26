@@ -7,37 +7,25 @@
     },
     "configurePresets": [
         {
-            "name": "debug",
-            "binaryDir": "./build/debug",
+            "name": "base",
+            "hidden": true,
             "cacheVariables": {
-                "PGEN_TEST": "OFF",
                 "CMAKE_CXX_EXTENSIONS": "OFF",
-                "CMAKE_CXX_STANDARD": "20",
-                "CMAKE_COLOR_DIAGNOSTICS": "ON",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "CMAKE_BUILD_TYPE": "debug",
-                "BUILD_SHARED_LIBS": "OFF"
-            }
-        },
-        {
-            "name": "release",
-            "binaryDir": "./build/release",
-            "cacheVariables": {
-                "PGEN_TEST": "OFF",
-                "CMAKE_CXX_EXTENSIONS": "OFF",
-                "CMAKE_CXX_STANDARD": "20",
-                "CMAKE_COLOR_DIAGNOSTICS": "ON",
-                "CMAKE_BUILD_TYPE": "release",
-                "BUILD_SHARED_LIBS": "OFF"
+                "CMAKE_CXX_STANDARD": "20"
             }
         },
         {
             "name": "dev",
             "inherits": [
-                "debug"
+                "base"
             ],
+            "binaryDir": "./build/debug",
             "cacheVariables": {
-                "PGEN_TEST": "ON"
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_COLOR_DIAGNOSTICS": "ON",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "BUILD_PGEN_TESTS": "ON",
+                "DEV_MODE": "ON"
             }
         }
     ],
@@ -45,14 +33,6 @@
         {
             "name": "dev",
             "configurePreset": "dev"
-        },
-        {
-            "name": "debug",
-            "configurePreset": "debug"
-        },
-        {
-            "name": "release",
-            "configurePreset": "release"
         }
     ],
     "testPresets": [
