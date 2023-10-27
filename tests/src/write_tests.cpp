@@ -11,6 +11,9 @@ namespace fs = std::filesystem;
 using pgen::point;
 using std::vector;
 
+// TODO:
+//  - Test directory creation
+
 TEST_CASE("Write points writes single file, relative path, empty content", "[write_points]") {
     auto tempdir = fs::temp_directory_path();
     auto root    = tempdir / "pgen_test";

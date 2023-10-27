@@ -14,6 +14,7 @@ include(cmake/dependencies.cmake)
 add_library(
     pgen_lib OBJECT
     src/lib.cpp
+    src/serial.cpp
 )
 
 target_include_directories(

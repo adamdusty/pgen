@@ -17,6 +17,8 @@ FetchContent_MakeAvailable(snitch)
 add_executable(pgen_tests
     src/write_tests.cpp
     src/render_tests.cpp
+    src/serial_tests.cpp
+    src/utils.cpp
 )
 
 target_link_libraries(pgen_tests PRIVATE pgen_lib snitch::snitch)

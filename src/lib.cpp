@@ -37,9 +37,7 @@ auto write_points(const fs::path& root, const std::vector<point>& points) -> res
 
         auto path = root / point.path;
         auto file = std::ofstream{path};
-        if(point.content) {
-            file << *point.content;
-        }
+        file << point.content;
 
         file.close();
     }
