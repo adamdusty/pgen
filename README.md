@@ -21,9 +21,6 @@ Personal utility for generating projects.
 
 Requirements:
 
-- [fmt](https://github.com/fmtlib/fmt) 10.0.0
-- [argprage](https://github.com/p-ranav/argparse) master
-- [tomlplusplus](https://github.com/marzer/tomlplusplus) master
 
 ```cmake
 cmake --preset release

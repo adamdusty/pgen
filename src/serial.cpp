@@ -40,13 +40,13 @@ auto deserialize_json(std::istream& input) -> std::vector<point> {
     auto points = std::vector<point>{};
 
     auto data = json::parse(input);
-    if(data.find("points") == data.end()) {
+    if(!data.contains("points")) {
         return {};
     }
 
     for(const auto& element: data.at("points")) {
         auto content = std::string{};
-        if(element.find("content") != element.end()) {
+        if(element.contains("content")) {
             content = element.at("content");
         }
         points.emplace_back(element.at("path"), content, element.at("dir"));

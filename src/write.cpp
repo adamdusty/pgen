@@ -1,20 +1,13 @@
-#include "lib.hpp"
+#include "write.hpp"
 
-#include <algorithm>
 #include <filesystem>
 #include <format>
 #include <fstream>
-#include <iostream>
-#include <memory>
-#include <ranges>
 #include <sstream>
-#include <stdexcept>
 
 namespace pgen {
 
-// namespace rv = std::ranges::views;
-
-auto write_points(const fs::path& root, const std::vector<point>& points) -> result {
+auto write_points(const fs::path& root, const std::vector<point>& points) -> write_result {
     if(fs::exists(root)) {
         return {
             .success = false,

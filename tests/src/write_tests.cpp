@@ -1,4 +1,5 @@
-#include "lib.hpp"
+#include "point.hpp"
+#include "write.hpp"
 #include <snitch/snitch.hpp>
 
 #include <filesystem>
@@ -144,8 +145,8 @@ TEST_CASE("Return unsuccessful when root directory already exists", "[write_poin
     auto result = pgen::write_points(root, points);
 
     CHECK(!result);
-    for(const auto& p: points) {
-        CHECK(!fs::exists(root / p.path));
+    for(const auto& point: points) {
+        CHECK(!fs::exists(root / point.path));
     }
 
     fs::remove_all(root);

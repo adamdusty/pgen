@@ -8,18 +8,18 @@ FetchContent_Declare(
 )
 
 set(JSON_BuildTests OFF CACHE INTERNAL "Don't build tests")
-FetchContent_Declare(
-    json
-    GIT_REPOSITORY https://github.com/nlohmann/json.git
-    GIT_TAG        v3.11.2
-    GIT_SHALLOW    TRUE
-    SYSTEM
-)
 # FetchContent_Declare(
 #     json
-#     URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz
+#     GIT_REPOSITORY https://github.com/nlohmann/json.git
+#     GIT_TAG        v3.11.2
+#     GIT_SHALLOW    TRUE
 #     SYSTEM
 # )
+FetchContent_Declare(
+    json
+    URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz
+    SYSTEM
+)
 
 set(INJA_USE_EMBEDDED_JSON OFF CACHE INTERNAL "Use external json")
 set(INJA_BUILD_TESTS OFF CACHE INTERNAL "Don't build tests")
