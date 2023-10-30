@@ -1,20 +1,6 @@
 include(FetchContent)
-FetchContent_Declare(
-    fmt
-    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-    GIT_TAG        10.1.1
-    GIT_SHALLOW    TRUE
-    SYSTEM
-)
 
 set(JSON_BuildTests OFF CACHE INTERNAL "Don't build tests")
-# FetchContent_Declare(
-#     json
-#     GIT_REPOSITORY https://github.com/nlohmann/json.git
-#     GIT_TAG        v3.11.2
-#     GIT_SHALLOW    TRUE
-#     SYSTEM
-# )
 FetchContent_Declare(
     json
     URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz
@@ -32,4 +18,14 @@ FetchContent_Declare(
     SYSTEM
 )
 
-FetchContent_MakeAvailable(fmt json inja)
+set(ARGPARSE_BUILD_TESTS OFF CACHE INTERNAL "Turn off building argparse tests")
+set(ARGPARSE_BUILD_SAMPLES OFF CACHE INTERNAL "Turn off building argparse samples")
+FetchContent_Declare(
+    argparse
+    GIT_REPOSITORY https://github.com/p-ranav/argparse.git
+    GIT_TAG        e4d4f67a449881ba4970dde2bb18c9c5d28669a9
+    GIT_SHALLOW    TRUE
+    SYSTEM
+)
+
+FetchContent_MakeAvailable(json inja argparse)

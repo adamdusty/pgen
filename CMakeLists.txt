@@ -24,7 +24,7 @@ target_include_directories(
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>"
 )
 
-target_link_libraries(pgen_lib PUBLIC fmt::fmt nlohmann_json::nlohmann_json pantor::inja)
+target_link_libraries(pgen_lib PUBLIC nlohmann_json::nlohmann_json pantor::inja argparse::argparse)
 
 add_executable(
     pgen_exe

@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <optional>
 #include <string>
+#include <vector>
 
 namespace pgen {
 
@@ -15,6 +16,13 @@ struct point {
     bool is_directory;
 
     auto operator<=>(const point&) const = default;
+};
+
+struct project {
+    std::vector<string> vars;
+    std::vector<point> points;
+
+    auto operator<=>(const project&) const = default;
 };
 
 } // namespace pgen

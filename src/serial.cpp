@@ -36,10 +36,17 @@ auto deserialize_directory(const fs::path& root) -> std::vector<point> {
     return points;
 }
 
-auto deserialize_json(std::istream& input) -> std::vector<point> {
-    auto points = std::vector<point>{};
+auto deserialize_json(std::istream& input) -> project {
+    auto proj = pgen::project{};
 
     auto data = json::parse(input);
+
+    if(data.contains("vars")) {
+        for(const auto& var: data.at("vars")) {
+            proj.vars.emplace_back(var);
+        }
+    }
+
     if(!data.contains("points")) {
         return {};
     }
@@ -49,10 +56,15 @@ auto deserialize_json(std::istream& input) -> std::vector<point> {
         if(element.contains("content")) {
             content = element.at("content");
         }
-        points.emplace_back(element.at("path"), content, element.at("dir"));
+        proj.points.emplace_back(element.at("path"), content, element.at("dir"));
     }
 
-    return points;
+    return proj;
+}
+
+auto deserialize_json(const fs::path& path) -> project {
+    auto stream = std::ifstream{path};
+    return deserialize_json(stream);
 }
 
 } // namespace pgen
