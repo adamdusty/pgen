@@ -16,6 +16,7 @@ add_library(
     src/serial.cpp
     src/write.cpp
     src/render.cpp
+    src/cmd.cpp
 )
 
 target_include_directories(

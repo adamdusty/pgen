@@ -13,6 +13,7 @@ Checks: "*,
   -cppcoreguidelines-non-private-member-variables-in-classes,
   -cppcoreguidelines-avoid-magic-numbers,
   -misc-non-private-member-variables-in-classes,
+  -modernize-use-nodiscard,
 "
 
 CheckOptions:
@@ -20,3 +21,5 @@ CheckOptions:
     value: 'a|b|x|y|z'
   - key: readability-identifier-length.IgnoredParameterNames
     value: 'a|b|x|y|z'
+  - key: readability-identifier-length.MinimumVariableNameLength
+    value: 2

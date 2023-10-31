@@ -67,4 +67,22 @@ auto deserialize_json(const fs::path& path) -> project {
     return deserialize_json(stream);
 }
 
+auto to_json(const project& proj) -> std::string {
+    auto data = json{};
+
+    for(const auto& var: proj.vars) {
+        data["vars"].emplace_back(var);
+    }
+
+    for(const auto& point: proj.points) {
+        json point_json;
+        point_json["path"]    = point.path;
+        point_json["content"] = point.content;
+        point_json["dir"]     = point.is_directory;
+        data["points"].emplace_back(point_json);
+    }
+
+    return data.dump(4);
+}
+
 } // namespace pgen

@@ -4,23 +4,19 @@ Personal utility for generating projects.
 
 ## Todo
 
-- [x] Error checking/handling during template reading
-- [x] Error checking/handling during rendering
-- [x] Option to remove directory if generation fails
-- [ ] Add support to generate template from existing directory (Make creating template easier hopefully)
-- [ ] Add support to read files with variable definitions instead of entering them one by one in terminal
-- [ ] Download/use templates from github
-  - Decide where to store templates and how executable should know about them
+- [ ] Validate user variables on template generation from directory (var names can't have filesystem illegal characters)
+- [ ] Validate template on read
+- [ ] Error checking/handling during rendering
+- [ ] Option to remove directory if generation fails (can't be default in case directory already exists)
+- [x] Add support to generate template from existing directory (Make creating template easier hopefully)
+- [ ] Use templates from network locations
 - [ ] Data for variable descriptions/documentation in template
-- [x] Add support for proper rendering with some functionality for dynamic templates
-  - Currently if you want an uppercase and lowercase version of the same variable the user has to enter both. It would be better if the template designer could just designate a variable and manipulate in the template.
-- [x] Add support for post and pre render commands
-- [x] Add clear warning when enabling commands
+- [x] Use proper rendering engine for rendering templates with dynamic variables
+- [ ] Add support back for toml (Support both toml and json?)
 
 ## Build & install from source
 
 Requirements:
-
 
 ```cmake
 cmake --preset release
@@ -30,10 +26,14 @@ cmake --install build/release
 
 ## Usage
 
-`pgen destination [-t|--template] "template_path" (-c|--commands)`  
-`pgen ~/dev/new_proj -t ~/pgen/templates/cpp-exe.toml`
+Use the gen subcommand to generate a project at a destination from a project template.
 
-Use the -c or --commands flag to enable any commands defined in the template. Don't enable commands for templates you don't trust or understand. Potentially harmful.
+`pgen gen destination template_path`  
+`pgen gen ~/dev/new_proj ~/pgen/templates/cpp-exe.json`
 
-`pgen ~/dev/new_proj -t ~/pgen/templates/cpp-exe.toml -c`  
-`pgen ~/dev/new_proj -t ~/pgen/templates/cpp-exe.toml --commands`
+Use the fd subcommand to generate a project template from a directory. You'll be prompted to declare the variables expected in the template.
+The default output is to stdout, but can be redirected to create a file via the `-o|--output` option.
+
+`pgen fd directory (-o|--output) output_path`  
+`pgen fd ~/dev/proj_templ_dir -o ~/pgen/templates/template.json`  
+`pgen fd ~/dev/proj_templ_dir --output ~/pgen/templates/template.json`

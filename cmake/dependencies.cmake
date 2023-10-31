@@ -23,7 +23,7 @@ set(ARGPARSE_BUILD_SAMPLES OFF CACHE INTERNAL "Turn off building argparse sample
 FetchContent_Declare(
     argparse
     GIT_REPOSITORY https://github.com/p-ranav/argparse.git
-    GIT_TAG        e4d4f67a449881ba4970dde2bb18c9c5d28669a9
+    GIT_TAG        e4d4f67a449881ba4970dde2bb18c9c5d28669a9 # master 10/31/2023
     GIT_SHALLOW    TRUE
     SYSTEM
 )

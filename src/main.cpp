@@ -1,70 +1,52 @@
-#include <filesystem>
-#include <format>
 #include <iostream>
-#include <stdexcept>
 #include <string>
-#include <unordered_map>
+#include <vector>
 
 #include <argparse/argparse.hpp>
 
-#include "project.hpp"
-#include "render.hpp"
-#include "serial.hpp"
-#include "write.hpp"
+#include "cmd.hpp"
 
 namespace ap = argparse;
-namespace fs = std::filesystem;
 
 auto main(int argc, char* argv[]) -> int {
+    auto cli = ap::ArgumentParser{"pgen", "0.2.0"};
 
-    auto cli = ap::ArgumentParser{"pgen", "0.1.0"};
+    auto gen = ap::ArgumentParser{"gen"};
+    gen.add_description("Generate project from a template file");
+    gen.add_argument("destination").help("Directory where project will be generated.");
+    gen.add_argument("template").help("Path to template.");
 
-    cli.add_argument("dest").help("Destination directory for project.");
-    cli.add_argument("-t", "--template").help("Template file.").required();
+    auto fd = ap::ArgumentParser{"fd"};
+    fd.add_description("Generate template file from a directory.");
+    fd.add_argument("dir").help("Directory to generate template from.");
+    fd.add_argument("-o", "--output").help("File to output template to.");
+
+    cli.add_subparser(fd);
+    cli.add_subparser(gen);
 
     try {
         cli.parse_args(argc, argv);
     } catch(const std::exception& err) {
-        std::cerr << "Error parsing arguments: " << err.what() << std::endl;
-        std::cerr << cli;
+        std::cerr << err.what() << std::endl;
         return 1;
     }
 
-    auto dest_str = cli.get<std::string>("dest");
-    auto tmpl_str = cli.get<std::string>("template");
+    if(cli.is_subcommand_used(gen)) {
+        auto dest = gen.get<std::string>("destination");
+        auto temp = gen.get<std::string>("template");
 
-    auto dest_path = fs::path{dest_str};
-    auto tmpl_path = fs::path{tmpl_str};
+        auto cmd = pgen::generate{dest, temp};
+        return cmd.execute();
+    } else if(cli.is_subcommand_used(fd)) {
+        auto dir = fd.get<std::string>("dir");
+        auto out = fd.present("-o");
 
-    if(fs::exists(dest_path)) {
-        std::cerr << std::format("Destination directory already exists: {}\n", dest_path.string());
-        std::cerr << "Aborting...";
-        return 1;
+        auto cmd = pgen::from_directory{dir, out};
+        return cmd.execute();
+    } else {
+        std::cout << cli;
+        return 0;
     }
-
-    if(!fs::exists(tmpl_path)) {
-        std::cerr << std::format("Cannot find template: {}\n", tmpl_path.string());
-        std::cerr << "Aborting...";
-        return 1;
-    }
-
-    // Read template
-    auto tmpl = pgen::deserialize_json(tmpl_path);
-
-    // Get vars from user
-    auto user_vars = std::unordered_map<std::string, std::string>{};
-    for(const auto& var: tmpl.vars) {
-        auto input = std::string{};
-        std::cout << std::format("{}: ", var);
-        std::getline(std::cin, input);
-        user_vars.emplace(var, input);
-    }
-
-    // Render points
-    auto rendered = pgen::render(user_vars, tmpl.points);
-
-    // Write points
-    auto result = pgen::write_points(dest_path, rendered);
 
     return 0;
 }
