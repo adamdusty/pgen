@@ -37,16 +37,16 @@ auto main(int argc, char* argv[]) -> int {
 
         auto cmd = pgen::generate{dest, temp};
         return cmd.execute();
-    } else if(cli.is_subcommand_used(fd)) {
+    }
+
+    if(cli.is_subcommand_used(fd)) {
         auto dir = fd.get<std::string>("dir");
         auto out = fd.present("-o");
 
         auto cmd = pgen::from_directory{dir, out};
         return cmd.execute();
-    } else {
-        std::cout << cli;
-        return 0;
     }
 
+    std::cout << cli;
     return 0;
 }
