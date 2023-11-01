@@ -27,12 +27,27 @@
                 "BUILD_PGEN_TESTS": "ON",
                 "DEV_MODE": "ON"
             }
+        },
+        {
+            "name": "release",
+            "inherits": [
+                "base"
+            ],
+            "binaryDir": "./build/release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "BUILD_PGEN_TESTS": "OFF"
+            }
         }
     ],
     "buildPresets": [
         {
             "name": "dev",
             "configurePreset": "dev"
+        },
+        {
+            "name": "release",
+            "configurePreset": "release"
         }
     ],
     "testPresets": [

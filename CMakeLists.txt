@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.27)
 
 project(
     pgen
-    VERSION 0.1.0
+    VERSION 0.2.1
     DESCRIPTION "A short description"
     LANGUAGES CXX
 )

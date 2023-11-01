@@ -15,12 +15,12 @@ auto deserialize_directory(const fs::path& root) -> std::vector<point> {
         point point{};
 
         if(entry.is_directory()) {
-            point.path         = entry.path();
+            point.path         = fs::relative(entry.path(), root);
             point.is_directory = true;
         }
 
         if(entry.is_regular_file()) {
-            point.path = entry.path();
+            point.path = fs::relative(entry.path(), root);
 
             if(entry.file_size() != 0) {
                 auto stream  = std::ifstream{entry.path()};

@@ -41,7 +41,7 @@ TEST_CASE("Directory, files, empty", "[deserialize_directory]") {
         auto fname = random_string();
         auto file  = std::ofstream{root / fname};
         file.close();
-        expected.emplace_back(root / fname);
+        expected.emplace_back(fname);
     }
 
     auto actual = pgen::deserialize_directory(root);
@@ -64,7 +64,7 @@ TEST_CASE("Directory, files, empty, content", "[deserialize_directory]") {
         auto fname = random_string();
         auto file  = std::ofstream{root / fname};
         file.close();
-        expected.emplace_back(root / fname);
+        expected.emplace_back(fname);
     }
 
     for(size_t i = 0; i < 10; ++i) {
@@ -73,7 +73,7 @@ TEST_CASE("Directory, files, empty, content", "[deserialize_directory]") {
         auto file    = std::ofstream{root / fname};
         file << content;
         file.close();
-        expected.emplace_back(root / fname, content);
+        expected.emplace_back(fname, content);
     }
 
     auto actual = pgen::deserialize_directory(root);
@@ -95,14 +95,14 @@ TEST_CASE("Directory, subdirs, files, content", "[deserialize_directory]") {
     for(size_t i = 0; i < 3; ++i) {
         auto subdir = root / std::format("subdir{}", i);
         fs::create_directories(subdir);
-        expected.emplace_back(subdir, "", true);
+        expected.emplace_back(fs::relative(subdir, root), "", true);
         for(size_t i = 0; i < 3; ++i) {
             auto fname   = random_string();
             auto content = random_string(128);
             auto file    = std::ofstream{subdir / fname};
             file << content;
             file.close();
-            expected.emplace_back(subdir / fname, content);
+            expected.emplace_back(fs::relative(subdir, root) / fname, content);
         }
     }
 

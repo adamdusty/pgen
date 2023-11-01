@@ -104,6 +104,26 @@ TEST_CASE("Write points writes multiple files, relative path, populated content"
     fs::remove_all(root);
 }
 
+TEST_CASE("Create directory points", "[write_points]") {
+    auto tempdir = fs::temp_directory_path();
+    auto root    = tempdir / "pgen_test";
+
+    auto points = vector<point>{
+        {.path = "subdir1", .content = "", .is_directory = true},
+        {.path = "subdir2", .content = "", .is_directory = true},
+        {.path = "subdir3/subdir4", .content = "", .is_directory = true},
+    };
+
+    auto res = pgen::write_points(root, points);
+
+    CHECK(res.success);
+    CHECK(fs::is_directory(root / "subdir1"));
+    CHECK(fs::is_directory(root / "subdir2"));
+    CHECK(fs::is_directory(root / "subdir3" / "subdir4"));
+
+    fs::remove_all(root);
+}
+
 TEST_CASE("Writes files in subdirectories of root", "[write_points]") {
     auto tempdir = fs::temp_directory_path();
     auto root    = tempdir / "pgen_test";
