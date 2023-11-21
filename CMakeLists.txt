@@ -17,6 +17,7 @@ add_library(
     src/write.cpp
     src/render.cpp
     src/cmd.cpp
+    src/validation.cpp
 )
 
 target_include_directories(

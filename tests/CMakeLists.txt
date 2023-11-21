@@ -18,6 +18,7 @@ add_executable(pgen_tests
     src/write_tests.cpp
     src/render_tests.cpp
     src/serial_tests.cpp
+    src/validation_tests.cpp
     src/utils.cpp
 )
 

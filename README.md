@@ -13,6 +13,7 @@ Personal utility for generating projects.
 - [ ] Data for variable descriptions/documentation in template
 - [x] Use proper rendering engine for rendering templates with dynamic variables
 - [ ] Add support back for toml (Support both toml and json?)
+- [ ] Read vars from points when deserializing a directory
 
 ## Build & install from source
 
