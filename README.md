@@ -14,6 +14,7 @@ Personal utility for generating projects.
 - [x] Use proper rendering engine for rendering templates with dynamic variables
 - [ ] Add support back for toml (Support both toml and json?)
 - [ ] Read vars from points when deserializing a directory
+- [ ] Add tests for cli
 
 ## Build & install from source
 

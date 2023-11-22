@@ -1,6 +1,9 @@
 #include "serial.hpp"
 
+#include "validation.hpp"
+#include <format>
 #include <fstream>
+#include <iostream>
 #include <nlohmann/json.hpp>
 #include <sstream>
 
@@ -36,10 +39,16 @@ auto deserialize_directory(const fs::path& root) -> std::vector<point> {
     return points;
 }
 
-auto deserialize_json(std::istream& input) -> project {
+auto deserialize_json(std::istream& input) -> std::optional<project> {
     auto proj = pgen::project{};
 
     auto data = json::parse(input);
+
+    auto result = validate_json(data);
+    if(!result.valid) {
+        std::cerr << std::format("Invalid template: {}", result.message);
+        return std::nullopt;
+    }
 
     if(data.contains("vars")) {
         for(const auto& var: data.at("vars")) {
@@ -62,7 +71,7 @@ auto deserialize_json(std::istream& input) -> project {
     return proj;
 }
 
-auto deserialize_json(const fs::path& path) -> project {
+auto deserialize_json(const fs::path& path) -> std::optional<project> {
     auto stream = std::ifstream{path};
     return deserialize_json(stream);
 }

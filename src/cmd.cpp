@@ -22,16 +22,20 @@ auto generate::execute() const -> int {
     }
 
     auto proj = deserialize_json(tmpl);
+    if(!proj) {
+        std::cerr << std::format("Error reading template: {}", tmpl.string());
+        return 1;
+    }
 
     auto user_vars = std::unordered_map<std::string, std::string>{};
-    for(const auto& var: proj.vars) {
+    for(const auto& var: proj->vars) {
         std::cout << std::format("{}: ", var);
         auto line = std::string{};
         std::getline(std::cin, line);
         user_vars.emplace(var, line);
     }
 
-    auto rendered = render(user_vars, proj.points);
+    auto rendered = render(user_vars, proj->points);
     auto res      = write_points(dest, rendered);
 
     if(!res) {

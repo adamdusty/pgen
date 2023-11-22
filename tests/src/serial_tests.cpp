@@ -119,7 +119,7 @@ TEST_CASE("Directory, subdirs, files, content", "[deserialize_directory]") {
 TEST_CASE("Empty template", "[deserialize_json]") {
     auto data = std::stringstream{R"({})"};
 
-    auto actual = pgen::deserialize_json(data);
+    auto actual = *pgen::deserialize_json(data);
 
     CHECK(actual.vars.empty());
     CHECK(actual.points.empty());
@@ -160,7 +160,7 @@ TEST_CASE("Files, empty", "[deserialize_json]") {
 
     auto actual = pgen::deserialize_json(data);
 
-    rv::sort(actual.points, [](point& a, point& b) { return a.path < b.path; });
+    rv::sort(actual->points, [](point& a, point& b) { return a.path < b.path; });
     rv::sort(expected.points, [](point& a, point& b) { return a.path < b.path; });
 
     CHECK(actual == expected);
@@ -201,7 +201,7 @@ TEST_CASE("Files, content", "[deserialize_json]") {
 
     auto actual = pgen::deserialize_json(data);
 
-    rv::sort(actual.points, [](point& a, point& b) { return a.path < b.path; });
+    rv::sort(actual->points, [](point& a, point& b) { return a.path < b.path; });
     rv::sort(expected.points, [](point& a, point& b) { return a.path < b.path; });
 
     CHECK(actual == expected);
@@ -252,7 +252,7 @@ TEST_CASE("Directories, Files, empty, content", "[deserialize_json]") {
 
     auto actual = pgen::deserialize_json(data);
 
-    rv::sort(actual.points, [](point& a, point& b) { return a.path < b.path; });
+    rv::sort(actual->points, [](point& a, point& b) { return a.path < b.path; });
     rv::sort(expected.points, [](point& a, point& b) { return a.path < b.path; });
 
     CHECK(actual == expected);
@@ -310,9 +310,9 @@ TEST_CASE("Directories, Files, empty, content, vars", "[deserialize_json]") {
 
     auto actual = pgen::deserialize_json(data);
 
-    rv::sort(actual.points, [](point& a, point& b) { return a.path < b.path; });
+    rv::sort(actual->points, [](point& a, point& b) { return a.path < b.path; });
     rv::sort(expected.points, [](point& a, point& b) { return a.path < b.path; });
-    rv::sort(actual.vars);
+    rv::sort(actual->vars);
     rv::sort(expected.vars);
 
     CHECK(actual == expected);
