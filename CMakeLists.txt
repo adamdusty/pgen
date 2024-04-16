@@ -22,6 +22,9 @@ target_include_directories(
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>"
 )
 
+# Link deps
+target_link_libraries(pgen_lib PRIVATE nonstd::expected-lite)
+
 # Add sources
 target_sources(pgen_lib PRIVATE
     src/lib.cpp
