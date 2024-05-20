@@ -88,6 +88,8 @@ auto write_template(const std::filesystem::path& destination,
     for(const auto& dir: tmpl.directories) {
         auto path = destination / dir;
 
+        std::cerr << "Creating directory: " << path.string() << '\n';
+
         if(!fs::create_directories(path)) {
             std::cerr << std::format("Error creating directory: {}\n", dir.string());
         }
@@ -97,6 +99,8 @@ auto write_template(const std::filesystem::path& destination,
         auto path = destination / fpath;
 
         fs::create_directories(path.parent_path());
+
+        std::cerr << "Creating file: " << path.string() << '\n';
 
         auto file = std::ofstream(path);
 

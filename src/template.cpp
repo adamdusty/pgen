@@ -151,9 +151,9 @@ auto parse_template(const std::string& tmpl_str) -> std::expected<project_templa
 
 auto to_yaml(const project_template& tmpl) -> std::expected<std::string, std::string> {
     auto emitter = YAML::Emitter();
+    emitter << YAML::BeginMap;
 
     if(!tmpl.variables.empty()) {
-        emitter << YAML::BeginMap;
         emitter << YAML::Key << "variables";
         emitter << YAML::Value << YAML::BeginSeq;
 
@@ -179,7 +179,6 @@ auto to_yaml(const project_template& tmpl) -> std::expected<std::string, std::st
         emitter << YAML::EndMap;
     }
     if(!tmpl.directories.empty()) {
-        emitter << YAML::BeginMap;
         emitter << YAML::Key << "directories";
         emitter << YAML::Value << YAML::BeginSeq;
 
@@ -188,11 +187,9 @@ auto to_yaml(const project_template& tmpl) -> std::expected<std::string, std::st
         }
 
         emitter << YAML::EndSeq;
-        emitter << YAML::EndMap;
     }
 
     if(!tmpl.files.empty()) {
-        emitter << YAML::BeginMap;
         emitter << YAML::Key << "files";
         emitter << YAML::Value << YAML::BeginSeq;
 
@@ -207,9 +204,9 @@ auto to_yaml(const project_template& tmpl) -> std::expected<std::string, std::st
         }
 
         emitter << YAML::EndSeq;
-        emitter << YAML::EndMap;
     }
 
+    emitter << YAML::EndMap;
     if(!emitter.good()) {
         return std::unexpected(std::format("Error converting to yaml: {}", emitter.GetLastError()));
     }
