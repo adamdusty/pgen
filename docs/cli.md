@@ -19,10 +19,9 @@ Generates a directory from the template file at the `<destination>` path. If spe
 
 `pgen fd <root> --output=<output-path> [<options>]`
 
-| Option        | Description                                                    |
-| ------------- | -------------------------------------------------------------- |
-| --output      | path to save template file at                                  |
-| --vars        | path to variable definition file                               |
-| --interactive | interactively add template variables after template generation |
+| Option            | Description                                                    |
+| ----------------- | -------------------------------------------------------------- |
+| -o, --output      | path to save template file at                                  |
+| -i, --interactive | interactively add template variables after template generation |
 
 Generates a template file based on a directory. Recursively reads directories and files starting at `<root>`. Template variables can be defined and passed in a separate file, and also defined interactively after the directory has been serialized by passing the `--interactive` flag.

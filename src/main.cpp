@@ -1,6 +1,7 @@
 #include <argparse/argparse.hpp>
 #include <chrono>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -21,13 +22,23 @@ auto main(int argc, char* argv[]) -> int {
     auto version = std::string("0.1.0");
     auto parser  = ap::ArgumentParser("pgen", version);
 
-    auto gen_cmd = ap::ArgumentParser("gen", version, argparse::default_arguments::help);
+    auto gen_cmd = ap::ArgumentParser("gen", version, ap::default_arguments::help);
     gen_cmd.add_description("Generate project");
     gen_cmd.add_argument("destination").help("Path to project generation destination");
     gen_cmd.add_argument("--template").help("Path to project template file").required();
     gen_cmd.add_argument("--definitions").help("Path to definitions file");
 
+    auto fd_cmd = ap::ArgumentParser("fd", version, ap::default_arguments::help);
+    fd_cmd.add_description("Generate project template from a directory");
+    fd_cmd.add_argument("root").help("Root directory to generate template from");
+    fd_cmd.add_argument("-o", "--output").help("File to write template to");
+    fd_cmd.add_argument("-i", "--interactive")
+        .help("Interactively prompt for variable definitions")
+        .default_value(false)
+        .implicit_value(true);
+
     parser.add_subparser(gen_cmd);
+    parser.add_subparser(fd_cmd);
 
     try {
         parser.parse_args(argc, argv);
@@ -67,6 +78,58 @@ auto main(int argc, char* argv[]) -> int {
             return 1;
         }
 
+    } else if(parser.is_subcommand_used(fd_cmd)) {
+        // Generate template from directory
+        auto root_str   = fd_cmd.get<std::string>("root");
+        auto output_str = fd_cmd.get<std::string>("output");
+
+        auto vars = std::vector<pgen::templated_variable>();
+
+        auto done = false;
+        while(fd_cmd.get<bool>("interactive")) {
+            auto ident = pgen::prompt(std::cout, "Variable identifier(Leave empty to finish)");
+            if(ident.empty()) {
+                done = true;
+                break;
+            }
+
+            auto display       = pgen::prompt(std::cout, "Variable display name");
+            auto desc          = pgen::prompt(std::cout, "Variable description");
+            auto default_value = pgen::prompt(std::cout, "Variable default value");
+
+            auto var       = pgen::templated_variable();
+            var.identifier = ident;
+            if(display.empty()) {
+                var.display_name = std::nullopt;
+            } else {
+                var.display_name = display;
+            }
+
+            if(desc.empty()) {
+                var.description = std::nullopt;
+            } else {
+                var.description = desc;
+            }
+
+            if(default_value.empty()) {
+                var.default_value = std::nullopt;
+            } else {
+                var.default_value = default_value;
+            }
+
+            vars.emplace_back(var);
+            std::cerr << "\nAdded variable:\n"
+                      << std::format("Identifier: {}\nDisplay Name: {}\nDescription: {}\nDefault: {}\n\n",
+                                     var.identifier,
+                                     var.display_name ? *var.display_name : "",
+                                     var.description ? *var.description : "",
+                                     var.default_value ? *var.default_value : "");
+        }
+
+        auto fd_result = pgen::from_directory(root_str, vars);
+        if(!fd_result) {
+            std::cerr << "Error: " << fd_result.error() << '\n';
+        }
     } else {
         std::cerr << parser;
     }
