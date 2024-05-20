@@ -1,7 +1,6 @@
 #include <argparse/argparse.hpp>
 #include <chrono>
 #include <filesystem>
-#include <format>
 #include <fstream>
 #include <iostream>
 #include <sstream>
