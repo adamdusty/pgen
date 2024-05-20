@@ -14,4 +14,5 @@ Checks: "*,
   -cppcoreguidelines-non-private-member-variables-in-classes,
   -cppcoreguidelines-avoid-magic-numbers,
   -misc-non-private-member-variables-in-classes,
-  -modernize-use-nodiscard"
+  -modernize-use-nodiscard,
+  -bugprone-easily-swappable-parameters"

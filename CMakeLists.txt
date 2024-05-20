@@ -23,11 +23,14 @@ target_include_directories(
 )
 
 # Link deps
-target_link_libraries(pgen_lib PRIVATE nonstd::expected-lite)
+target_link_libraries(pgen_lib PUBLIC yaml-cpp::yaml-cpp argparse::argparse)
 
 # Add sources
 target_sources(pgen_lib PRIVATE
     src/lib.cpp
+    src/template.cpp
+    src/render.cpp
+    src/cli.cpp
 )
 
 # Declare executable
@@ -42,7 +45,6 @@ target_sources(pgen PRIVATE
 target_link_libraries(pgen PRIVATE pgen_lib)
 
 # Add compile options
-add_dev_compile_opts(pgen_lib)
 add_dev_compile_opts(pgen)
 
 
