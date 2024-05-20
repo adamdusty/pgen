@@ -118,9 +118,12 @@ auto from_directory(const std::filesystem::path& root,
 
     for(const auto& entry: fs::recursive_directory_iterator(root)) {
         if(entry.is_directory()) {
-            directories.emplace_back(entry.path().string());
+            auto dir = fs::relative(entry, root);
+            directories.emplace_back(dir.string());
         } else {
-            files.emplace_back(project_file::from_path(entry));
+            auto f = project_file::from_path(entry);
+            f.path = fs::relative(entry, root).string();
+            files.emplace_back(f);
         }
     }
 

@@ -206,19 +206,19 @@ TEST_CASE("From directory") {
     REQUIRE(result);
     CHECK(result->files.size() == 2);
 
-    auto tmpl_f1 = std::ranges::find_if(result->files, [&](auto f) { return f.path == dir / "file.json"; });
+    auto tmpl_f1 = std::ranges::find_if(result->files, [&](auto f) { return f.path == "file.json"; });
 
     CHECK(tmpl_f1 != result->files.end());
     CHECK(tmpl_f1->content);
     CHECK(*(tmpl_f1->content) == "{\"name\" : \"dave\"}");
 
-    auto tmpl_f2 = std::ranges::find_if(result->files, [&](auto f) { return f.path == dir / "subdir1" / "file1.txt"; });
+    auto tmpl_f2 = std::ranges::find_if(result->files, [&](auto f) { return f.path == fs::path("subdir1/file1.txt"); });
     CHECK(tmpl_f2 != result->files.end());
     CHECK(tmpl_f2->content);
     CHECK(*(tmpl_f2->content) == "Hello world");
 
-    CHECK(std::ranges::find(result->directories, (dir / "subdir1").string()) != result->directories.end());
-    CHECK(std::ranges::find(result->directories, (dir / "subdir2").string()) != result->directories.end());
+    CHECK(std::ranges::find(result->directories, "subdir1") != result->directories.end());
+    CHECK(std::ranges::find(result->directories, "subdir2") != result->directories.end());
 }
 
 TEST_CASE("Render project template", "[render_template]") {

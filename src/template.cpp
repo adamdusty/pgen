@@ -18,7 +18,7 @@ auto project_file::from_path(const std::filesystem::path& path) -> project_file 
     auto string_stream = std::stringstream();
     string_stream << file_stream.rdbuf();
 
-    return {path.string(), string_stream.str()};
+    return {fs::relative(path).string(), string_stream.str()};
 }
 
 auto project_template::from_file(const std::filesystem::path& path) -> std::expected<project_template, std::string> {
