@@ -85,11 +85,9 @@ auto main(int argc, char* argv[]) -> int {
 
         auto vars = std::vector<pgen::templated_variable>();
 
-        auto done = false;
         while(fd_cmd.get<bool>("interactive")) {
             auto ident = pgen::prompt(std::cout, "Variable identifier(Leave empty to finish)");
             if(ident.empty()) {
-                done = true;
                 break;
             }
 
@@ -130,6 +128,15 @@ auto main(int argc, char* argv[]) -> int {
         if(!fd_result) {
             std::cerr << "Error: " << fd_result.error() << '\n';
         }
+
+        auto yaml = pgen::to_yaml(*fd_result);
+        if(!yaml) {
+            std::cerr << "Error converting to yaml: " << yaml.error() << '\n';
+        }
+
+        auto output = std::ofstream(output_str);
+        output << *yaml;
+        output.close();
     } else {
         std::cerr << parser;
     }

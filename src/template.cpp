@@ -1,5 +1,6 @@
 #include "template.hpp"
 
+#include <format>
 #include <fstream>
 #include <sstream>
 #include <yaml-cpp/yaml.h>
@@ -146,6 +147,74 @@ auto parse_template(const std::string& tmpl_str) -> std::expected<project_templa
     }
 
     return tmpl;
+}
+
+auto to_yaml(const project_template& tmpl) -> std::expected<std::string, std::string> {
+    auto emitter = YAML::Emitter();
+
+    if(!tmpl.variables.empty()) {
+        emitter << YAML::BeginMap;
+        emitter << YAML::Key << "variables";
+        emitter << YAML::Value << YAML::BeginSeq;
+
+        for(const auto& var: tmpl.variables) {
+            emitter << YAML::BeginMap;
+            emitter << YAML::Key << "identifier" << YAML::Value << var.identifier;
+
+            if(var.display_name) {
+                emitter << YAML::Key << "display_name" << YAML::Value << *var.display_name;
+            }
+
+            if(var.description) {
+                emitter << YAML::Key << "description" << YAML::Value << *var.description;
+            }
+
+            if(var.default_value) {
+                emitter << YAML::Key << "default_value" << YAML::Value << *var.default_value;
+            }
+            emitter << YAML::EndMap;
+        }
+
+        emitter << YAML::EndSeq;
+        emitter << YAML::EndMap;
+    }
+    if(!tmpl.directories.empty()) {
+        emitter << YAML::BeginMap;
+        emitter << YAML::Key << "directories";
+        emitter << YAML::Value << YAML::BeginSeq;
+
+        for(const auto& dir: tmpl.directories) {
+            emitter << dir;
+        }
+
+        emitter << YAML::EndSeq;
+        emitter << YAML::EndMap;
+    }
+
+    if(!tmpl.files.empty()) {
+        emitter << YAML::BeginMap;
+        emitter << YAML::Key << "files";
+        emitter << YAML::Value << YAML::BeginSeq;
+
+        for(const auto& file: tmpl.files) {
+            emitter << YAML::BeginMap;
+            emitter << YAML::Key << "path" << YAML::Value << file.path;
+
+            if(file.content) {
+                emitter << YAML::Key << "content" << YAML::Literal << YAML::Value << *file.content;
+            }
+            emitter << YAML::EndMap;
+        }
+
+        emitter << YAML::EndSeq;
+        emitter << YAML::EndMap;
+    }
+
+    if(!emitter.good()) {
+        return std::unexpected(std::format("Error converting to yaml: {}", emitter.GetLastError()));
+    }
+
+    return emitter.c_str();
 }
 
 } // namespace pgen

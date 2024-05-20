@@ -36,6 +36,7 @@ struct rendered_template {
     std::unordered_map<std::filesystem::path, std::string> files;
 };
 
+auto to_yaml(const project_template& tmpl) -> std::expected<std::string, std::string>;
 auto parse_template(const std::string& tmpl_str) -> std::expected<project_template, std::string>;
 
 } // namespace pgen
