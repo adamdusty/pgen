@@ -176,7 +176,6 @@ auto to_yaml(const project_template& tmpl) -> std::expected<std::string, std::st
         }
 
         emitter << YAML::EndSeq;
-        emitter << YAML::EndMap;
     }
     if(!tmpl.directories.empty()) {
         emitter << YAML::Key << "directories";
