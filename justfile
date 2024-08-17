@@ -1,4 +1,4 @@
-set shell := ["pwsh.exe", "-c"]
+set windows-shell := ["pwsh.exe", "-c"]
 
 configure:
     cmake --preset dev -G Ninja
